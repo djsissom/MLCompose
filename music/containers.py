@@ -66,35 +66,35 @@ class Control():
 		self.endsong_node         = self.nodes[0,0:1]
 		self.notemode_node        = self.nodes[0,1:2]
 		self.controlmode_node     = self.nodes[0,2:3]
-		self.change_timesig_node  = self.nodes[0,3:4]
-		self.change_keysig_node   = self.nodes[0,4:5]
+		self.change_keysig_node   = self.nodes[0,3:4]
+		self.change_timesig_node  = self.nodes[0,4:5]
 		self.change_tempo_node    = self.nodes[0,5:6]
-		self.pedal_toggle_node    = self.nodes[0,6:7]
-		self.hand_toggle_node     = self.nodes[0,7:8]
-
-		# second and third rows used for per note settings
-		self.note_settings_nodes  = self.nodes[1:3,:]
-
-		self.arpeggio_nodes       = self.nodes[1,0:3]
-		self.tie_nodes            = self.nodes[1,3:5]
-		self.shift_nodes          = self.nodes[1,5:8]
-
-		self.accent_nodes         = self.nodes[2,0:2]
-		self.dynamic_nodes        = self.nodes[2,2:8]
+		self.change_dynamic_node  = self.nodes[0,6:7]
+		self.pedal_toggle_node    = self.nodes[0,7:8]
 
 		# note mode needs note value, octave, and length
-		self.rest_node            = self.nodes[3,0:1]
-		self.note_nodes           = self.nodes[3,:]
-		self.octave_nodes         = self.nodes[4,:]
-		self.length_nodes         = self.nodes[5,:]
-		self.length_dot_nodes     = self.nodes[5,6:8]
+		self.rest_node            = self.nodes[1,0:1]
+		self.note_nodes           = self.nodes[1,:]      # cyclical
+		self.octave_nodes         = self.nodes[2,:]      # linear
+		self.duration_nodes       = self.nodes[3,0:6]    # linear
+		self.tie_nodes            = self.nodes[3,6:8]    # on/off
+
+		# last two rows used for other per note settings
+		self.note_settings_nodes  = self.nodes[4:6,:]
+
+		self.accidental_nodes     = self.nodes[4,0:3]    # flat, natural (no change), sharp
+		self.accent_nodes         = self.nodes[4,3:5]    # on/off
+		self.arpeggio_nodes       = self.nodes[4,5:8]    # off/up/down
+		self.velocity_nodes       = self.nodes[5,0:6]    # linear
+		self.hand_nodes           = self.nodes[5,6:8]    # left/right
 
 		# settings for control modes
-		self.timesig_numer_nodes  = self.nodes[3:5,:]
+		self.keysig_nodes         = self.nodes[1,:]
+		self.keysig_sf_nodes      = self.nodes[4,0:3]
+		self.timesig_numer_nodes  = self.nodes[2:4,:]
 		self.timesig_denom_nodes  = self.nodes[5,:]
-		self.keysig_sf_nodes      = self.nodes[1,5:8]
-		self.keysig_nodes         = self.nodes[3,:]
 		self.tempo_nodes          = self.nodes[4:6,:]
+		self.dynamic_nodes        = self.nodes[5,0:6]
 
 
 	def make_note(self):
