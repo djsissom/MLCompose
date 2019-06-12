@@ -13,6 +13,11 @@ def main():
 	Formatting and storage for music data.
 	'''
 
+	test_song = Song()
+	test_note = Note()
+	test_chord = Chord()
+	test_control = Control()
+
 	return
 
 
@@ -59,10 +64,15 @@ class Control():
 		# tensor of nodes from neural net output
 		self.nodes = np.zeros((6,8), dtype=np.float)
 
+		# Array slices are used to make view instead of copy.  Descriptive
+		# names can then be used to reference node values without
+		# reinitialization steps.
+
 		# first row used for mode control toggles
 		self.modecontrol_nodes    = self.nodes[0,:]
+		self.mode_nodes           = self.nodes[0,0:3]
+		self.controloption_nodes  = self.nodes[0,3:8]
 
-		# array slices are used to make view instead of copy
 		self.endsong_node         = self.nodes[0,0:1]
 		self.notemode_node        = self.nodes[0,1:2]
 		self.controlmode_node     = self.nodes[0,2:3]
@@ -95,11 +105,44 @@ class Control():
 		self.timesig_denom_nodes  = self.nodes[5,:]
 		self.tempo_nodes          = self.nodes[4:6,:]
 		self.dynamic_nodes        = self.nodes[5,0:6]
+		### ### ### ###
+
+
+	def update(self):
+		max_mode_index = self.mode_nodes.argmax()
+		mode_functions = [
+			self.end_song,
+			self.make_note,
+			self.set_control_signal
+		]
+		mode_function = mode_functions[max_mode_index]
+		return mode_function()
+
+
+	def update_altmethod(self):
+		if (endsong_node > notemode_node) and (endsong_node > controlmode_node):
+			return self.end_song()
+		elif (notemode_node >= endsong_node) and (notemode_node >= controlmode_node):
+			return self.make_note()
+		elif (controlmode_node >= endsong_node) and (controlmode_node > notemode_node):
+			return self.set_control_signal()
+		else:
+			print("Shouldn't get here...")
+			sys.exit(1923485)
+		return
+
+
+	def end_song(self):
+		return
 
 
 	def make_note(self):
 		note = Note()
 		return note
+
+
+	def set_control_signal(self):
+		return
 
 
 
