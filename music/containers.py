@@ -39,7 +39,7 @@ class Song():
 
 
 class Note():
-	def __init__(self, value=None, octave=None, duration=None, intensity=None, tie=None):
+	def __init__(self, degree=None, octave=None, duration=None, intensity=None, tie=None):
 		self.value = value
 		self.octave = octave
 		self.duration = duration
@@ -60,7 +60,10 @@ class Chord():
 
 
 class Control():
-	def __init__(self):
+	def __init__(self, song=None):
+		# set default song to work on
+		self.song = song
+
 		# tensor of nodes from neural net output
 		self.nodes = np.zeros((6,8), dtype=np.float)
 
@@ -108,7 +111,20 @@ class Control():
 		### ### ### ###
 
 
-	def update(self):
+	def set_song(self, song):
+		self.song = song
+		return
+
+
+	def get_song(self, song=None):
+		if song == None:
+			song = self.song
+		return song
+
+
+	def update(self, song=None):
+		song = self.get_song(song)
+
 		max_mode_index = self.mode_nodes.argmax()
 		mode_functions = [
 			self.end_song,
@@ -116,32 +132,56 @@ class Control():
 			self.set_control_signal
 		]
 		mode_function = mode_functions[max_mode_index]
-		return mode_function()
+		return mode_function(song)
 
 
-	def update_altmethod(self):
-		if (endsong_node > notemode_node) and (endsong_node > controlmode_node):
-			return self.end_song()
-		elif (notemode_node >= endsong_node) and (notemode_node >= controlmode_node):
-			return self.make_note()
-		elif (controlmode_node >= endsong_node) and (controlmode_node > notemode_node):
-			return self.set_control_signal()
+	def update_altmethod(self, song=None):
+		song = self.get_song(song)
+
+		if (endsong_node > notemode_node) and \
+		   (endsong_node > controlmode_node):
+			return self.end_song(song)
+		elif (notemode_node >= endsong_node) and \
+		     (notemode_node >= controlmode_node):
+			return self.make_note(song)
+		elif (controlmode_node >= endsong_node) and \
+		     (controlmode_node > notemode_node):
+			return self.set_control_signal(song)
 		else:
 			print("Shouldn't get here...")
 			sys.exit(1923485)
 		return
 
 
-	def end_song(self):
+	def end_song(self, song=None):
+		song = self.get_song(song)
 		return
 
 
-	def make_note(self):
-		note = Note()
+	def make_note(self, song=None, key='C_Maj'):
+		song = self.get_song(song)
+		if song == None:
+			song = self.song
+
+		note_index = self.note_nodes.argmax()
+		if note_index == 0:
+			self.set_rest()
+		else:
+			scale_degree = note_index
+
+		note = Note(degree=scale_degree, octave=octave, \
+		            duration=duration, intensity=intensity, \
+					tie=tie)
 		return note
 
 
-	def set_control_signal(self):
+	def set_rest(self, song=None):
+		song = self.get_song(song)
+		return
+
+
+	def set_control_signal(self, song=None):
+		song = self.get_song(song)
 		return
 
 
