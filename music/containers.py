@@ -38,6 +38,23 @@ class Song():
 
 
 
+class Measure():
+	def __init__(self, key=None, time_signaure=None):
+		self.key = key
+		self.time_signature = time_signature
+
+
+	def set_key(self, key):
+		self.key = key
+		return
+
+
+	def set_timesig(self, time_signature):
+		self.time_signature = time_signature
+		return
+
+
+
 class Note():
 	def __init__(self, degree=None, octave=None, duration=None, intensity=None, tie=None):
 		self.value = value
