@@ -27,6 +27,7 @@ class Song():
 		self.settings = settings
 		self.key = key
 		self.time_signature = time_signature
+		self.measures = []  # should we use pandas series here?
 
 
 	def add_chord(self, chord):
@@ -42,6 +43,7 @@ class Measure():
 	def __init__(self, key=None, time_signaure=None):
 		self.key = key
 		self.time_signature = time_signature
+		self.notes = []  # should we use pandas series here?
 
 
 	def set_key(self, key):
