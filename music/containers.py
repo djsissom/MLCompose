@@ -27,14 +27,32 @@ class Song():
 		self.settings = settings
 		self.key = key
 		self.time_signature = time_signature
-		self.measures = []  # should we use pandas series here?
+		self.tracks = []
 
 
-	def add_chord(self, chord):
+	def add_track(self, track):
+		self.tracks.append(track)
+		return self.tracks
+
+
+
+class Track():
+	def __init__(self, desc=None):
+		self.description = desc
+		self.measures = []
+
+
+	def set_description(self, desc):
+		self.description = desc
 		return
 
 
-	def add_note(self, note):
+	def get_description(self):
+		return self.description
+
+
+	def append_measure(self, measure):
+		self.measures.append(measure)
 		return
 
 
