@@ -130,14 +130,17 @@ class Control():
 		### ### ### ###
 
 
+	song = property(get_song, set_song)
+
+
 	def set_song(self, song):
-		self.song = song
+		self._song = song
 		return
 
 
 	def get_song(self, song=None):
 		if song == None:
-			song = self.song
+			song = self._song
 		return song
 
 
