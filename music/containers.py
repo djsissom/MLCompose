@@ -65,7 +65,7 @@ class Track():
 
 
 class Measure():
-	def __init__(self, key=None, time_signaure=None):
+	def __init__(self, key=None, time_signature=None):
 		self.key = key
 		self.time_signature = time_signature
 		self.notes = []  # should we use pandas series here?
@@ -89,7 +89,7 @@ class Beat():
 
 
 class Note():
-	def __init__(self, degree=None, octave=None, duration=None, intensity=None, tie=None):
+	def __init__(self, value=None, octave=None, duration=None, intensity=None, tie=None):
 		self.value = value
 		self.octave = octave
 		self.duration = duration
@@ -163,9 +163,6 @@ class Control():
 		### ### ### ###
 
 
-	song = property(get_song, set_song)
-
-
 	def set_song(self, song):
 		self._song = song
 		return
@@ -175,6 +172,9 @@ class Control():
 		if song == None:
 			song = self._song
 		return song
+
+
+	song = property(get_song, set_song)
 
 
 	def update(self, song=None):
