@@ -14,9 +14,16 @@ def main():
 	'''
 
 	test_song = Song()
+	test_track = Track()
+	test_measure = Measure()
+	test_beat = Beat()
 	test_note = Note()
-	test_chord = Chord()
+	test_rest = Rest()
+	test_event = Event()
 	test_control = Control()
+
+	test_song.add_track(test_track)
+	test_track.append_measure(test_measure)
 
 	return
 

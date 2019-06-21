@@ -6,6 +6,8 @@ from . import convert
 Song    = containers.Song
 Track   = containers.Track
 Measure = containers.Measure
-Chord   = containers.Chord
+Beat    = containers.Beat
 Note    = containers.Note
+Rest    = containers.Rest
+Event   = containers.Event
 Control = containers.Control
