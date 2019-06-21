@@ -85,6 +85,12 @@ class Note():
 
 
 
+class Rest():
+	def __init__(self, duration=None):
+		self.duration = duration
+
+
+
 class Chord():
 	def __init__(self, key='C_Maj', timediff=32):
 		self.key = key
@@ -93,6 +99,13 @@ class Chord():
 
 	def to_notes(self):
 		return
+
+
+
+class Event():
+	def __init__(self, event_type=None, descr=None):
+		self.event_type = event_type
+		self.description = descr
 
 
 
