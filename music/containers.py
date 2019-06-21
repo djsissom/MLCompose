@@ -75,6 +75,12 @@ class Measure():
 
 
 
+class Beat():
+	def __init__(self, offset=0.):
+		self.offset = offset
+
+
+
 class Note():
 	def __init__(self, degree=None, octave=None, duration=None, intensity=None, tie=None):
 		self.value = value
@@ -88,17 +94,6 @@ class Note():
 class Rest():
 	def __init__(self, duration=None):
 		self.duration = duration
-
-
-
-class Chord():
-	def __init__(self, key='C_Maj', timediff=32):
-		self.key = key
-		self.nodes = np.zeros((2,200), dtype=np.bool)
-
-
-	def to_notes(self):
-		return
 
 
 
