@@ -68,7 +68,7 @@ class Measure():
 	def __init__(self, key=None, time_signature=None):
 		self.key = key
 		self.time_signature = time_signature
-		self.notes = []  # should we use pandas series here?
+		self.beats = []
 
 
 	def set_key(self, key):
@@ -81,10 +81,21 @@ class Measure():
 		return
 
 
+	def append_beat(self, beat):
+		self.beats.append(beat)
+		return
+
+
 
 class Beat():
 	def __init__(self, offset=0.):
 		self.offset = offset
+		self.notes = []
+
+
+	def append_note(self, note):
+		self.notes.append(note)
+		return
 
 
 
