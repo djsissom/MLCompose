@@ -42,6 +42,12 @@ class Song():
 		return self.tracks
 
 
+	def end_song(self):
+		for track in self.tracks:
+			track.end_track()
+		return
+
+
 
 class Track():
 	def __init__(self, desc=None):
@@ -60,6 +66,12 @@ class Track():
 
 	def append_measure(self, measure):
 		self.measures.append(measure)
+		return self.measures
+
+
+	def end_track(self):
+		end_signal = Event('end_track')
+		self.measures[-1].add_event(end_signal)
 		return
 
 
@@ -83,6 +95,10 @@ class Measure():
 
 	def append_beat(self, beat):
 		self.beats.append(beat)
+		return self.beats
+
+
+	def add_event(self, event):
 		return
 
 
@@ -95,7 +111,7 @@ class Beat():
 
 	def append_note(self, note):
 		self.notes.append(note)
-		return
+		return self.notes
 
 
 
