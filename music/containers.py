@@ -30,11 +30,24 @@ def main():
 
 
 class Song():
-	def __init__(self, key='C_Maj', time_signature=None, settings=None):
+	def __init__(self, key='C_Maj', time_signature='4/4', settings=None):
 		self.settings = settings
 		self.key = key
 		self.time_signature = time_signature
 		self.tracks = []
+
+
+	def set_timesig(self, timesig):
+		self._time_signature = TimeSignature(timesig)
+		return
+
+
+	def get_timesig(self):
+		timesig = self._time_signature
+		return timesig
+
+
+	time_signature = property(get_timesig, set_timesig)
 
 
 	def add_track(self, track):
@@ -135,6 +148,18 @@ class Event():
 	def __init__(self, event_type=None, descr=None):
 		self.event_type = event_type
 		self.description = descr
+
+
+
+class TimeSignature():
+	def __init__(self, timesig=None):
+		self.check_init_type(timesig)
+
+
+	def check_init_type(self, timesig):
+		if not isinstance(timesig, TimeSignature):
+			pass
+		return
 
 
 
