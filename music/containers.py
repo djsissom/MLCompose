@@ -152,14 +152,20 @@ class Event():
 
 
 class TimeSignature():
-	def __init__(self, timesig=None):
-		self.check_init_type(timesig)
+	def __new__(cls, timesig=None):
+		if isinstance(timesig, TimeSignature):
+			return timesig
+
+		instance = super(TimeSignature, cls).__new__(cls)
+		instance.init(timesig)
+		return instance
 
 
-	def check_init_type(self, timesig):
-		if not isinstance(timesig, TimeSignature):
-			pass
-		return
+	# Note that this is not a real __init__ function, since we wouldn't be able
+	# to keep that from being called even when the class instantiation is
+	# passed an existing instance as the argument.
+	def init(self, timesig=None):
+		self.stringrep = timesig
 
 
 
