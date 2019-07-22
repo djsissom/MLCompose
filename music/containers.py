@@ -165,7 +165,45 @@ class TimeSignature():
 	# to keep that from being called even when the class instantiation is
 	# passed an existing instance as the argument.
 	def init(self, timesig=None):
-		self.stringrep = timesig
+		if timesig is not None:
+			self.set(timesig)
+
+
+	def set(self, timesig):
+		input_type = type(timesig)
+		case = {
+			str: self.parse_string,
+			tuple: self.parse_tuple
+		}
+		parse_func = case.get(input_type)
+		numerator, denominator = parse_func(timesig)
+		self.numerator = numerator
+		self.denominator = denominator
+		return self
+
+
+	def parse_string(self, timesig):
+		delimiters = ['/', '-', '_', '.', ',', ' ']
+		if any(delimiter in timesig for delimiter in delimiters):
+			for delimiter in delimiters:
+				if delimiter in timesig:
+					timesig_tuple = timesig.split(delimiter)
+					numerator, denominator = self.parse_tuple(timesig_tuple)
+					break
+		else:
+			raise AttributeError("Available TimeSignature string delimiters: '" \
+				+ "', '".join(delimiters) + "'")
+		return numerator, denominator
+
+
+	def parse_tuple(self, timesig):
+		if len(timesig) == 2:
+			numerator = timesig[0]
+			denominator = timesig[1]
+		else:
+			raise AttributeError( \
+				"Setting TimeSignature with tuple requires a length 2 tuple.")
+		return numerator, denominator
 
 
 
