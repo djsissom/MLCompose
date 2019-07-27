@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 from ipdb import set_trace
 
+from .. import util
+
 
 
 def main():
@@ -151,29 +153,17 @@ class Event():
 
 
 
-class TimeSignature():
+class TimeSignature(util.CheckArg):
 	'''
 	TimeSignature class to handle formatting and saving time signature
 	representations.  The optional timesig argument can be a length-2 tuple
 	containing the numerator and denominator of the time signature, a string
 	containing the numerator and denominator separated by one of '/', '-', '_',
 	'.', ',', or ' ', or an existing instance of the class.  The respective
-	properties can be via the numerator or denominator attributes or by casting
-	the instance to a string.
+	properties can be accessed via the numerator or denominator attributes or
+	by casting the instance to a string.
 	'''
-	def __new__(cls, timesig=None):
-		if isinstance(timesig, TimeSignature):
-			return timesig
-
-		instance = super(TimeSignature, cls).__new__(cls)
-		instance.init(timesig)
-		return instance
-
-
-	# Note that this is not a real __init__ function, since we wouldn't be able
-	# to keep that from being called even when the class instantiation is
-	# passed an existing instance as the argument.
-	def init(self, timesig=None):
+	def __init__(self, timesig=None):
 		self.numerator = None
 		self.denominator = None
 		if timesig is not None:
