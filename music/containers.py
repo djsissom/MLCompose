@@ -152,6 +152,15 @@ class Event():
 
 
 class TimeSignature():
+	'''
+	TimeSignature class to handle formatting and saving time signature
+	representations.  The optional timesig argument can be a length-2 tuple
+	containing the numerator and denominator of the time signature, a string
+	containing the numerator and denominator separated by one of '/', '-', '_',
+	'.', ',', or ' ', or an existing instance of the class.  The respective
+	properties can be via the numerator or denominator attributes or by casting
+	the instance to a string.
+	'''
 	def __new__(cls, timesig=None):
 		if isinstance(timesig, TimeSignature):
 			return timesig
@@ -165,6 +174,8 @@ class TimeSignature():
 	# to keep that from being called even when the class instantiation is
 	# passed an existing instance as the argument.
 	def init(self, timesig=None):
+		self.numerator = None
+		self.denominator = None
 		if timesig is not None:
 			self.set(timesig)
 
@@ -198,12 +209,22 @@ class TimeSignature():
 
 	def parse_tuple(self, timesig):
 		if len(timesig) == 2:
-			numerator = timesig[0]
-			denominator = timesig[1]
+			numerator = int(timesig[0])
+			denominator = int(timesig[1])
 		else:
 			raise AttributeError( \
 				"Setting TimeSignature with tuple requires a length 2 tuple.")
 		return numerator, denominator
+
+
+	def __str__(self):
+		numer = self.numerator
+		denom = self.denominator
+		if (numer is not None) and (denom is not None):
+			repstring = str(numer) + '/' + str(denom)
+		else:
+			repstring = 'Uninitialized time signature'
+		return repstring
 
 
 
