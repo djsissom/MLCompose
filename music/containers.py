@@ -153,6 +153,15 @@ class Event():
 
 
 
+class Key(util.CheckArg):
+	'''
+	Key class docstring.
+	'''
+	def __init__(self, key=None):
+		pass
+
+
+
 class TimeSignature(util.CheckArg):
 	'''
 	TimeSignature class to handle formatting and saving time signature
