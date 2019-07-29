@@ -139,6 +139,16 @@ class Note():
 		self.tie = tie
 
 
+	def degree_to_note(self, degree):
+		note = degree  # TODO: add conversion
+		return note
+
+
+	def note_to_degree(self, note):
+		degree = note  # TODO: add conversion
+		return degree
+
+
 
 class Rest():
 	def __init__(self, duration=None):
