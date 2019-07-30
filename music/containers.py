@@ -147,10 +147,23 @@ class Measure():
 
 
 class Beat():
-	def __init__(self, offset=0.):
+	def __init__(self, offset=1):
 		self.offset = offset
 		self.notes = []
 		self.events = []
+
+
+	def set_offset(self, offset):
+		self._offset = offset
+		return
+
+
+	def get_offset(self):
+		offset = self._offset
+		return offset
+
+
+	offset = property(get_offset, set_offset)
 
 
 	def append_note(self, note):
