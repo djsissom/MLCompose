@@ -52,6 +52,19 @@ class Song():
 	time_signature = property(get_timesig, set_timesig)
 
 
+	def set_keysig(self, keysig):
+		self._key = Key(keysig)
+		return key
+
+
+	def get_keysig(self):
+		keysig = self._key
+		return keysig
+
+
+	key = property(get_keysig, set_keysig)
+
+
 	def add_track(self, track):
 		self.tracks.append(track)
 		return self.tracks
