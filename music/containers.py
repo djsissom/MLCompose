@@ -84,12 +84,15 @@ class Track():
 
 
 	def set_description(self, desc):
-		self.description = desc
+		self._description = desc
 		return
 
 
 	def get_description(self):
-		return self.description
+		return self._description
+
+
+	description = property(get_description, set_description)
 
 
 	def append_measure(self, measure):
