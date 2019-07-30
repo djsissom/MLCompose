@@ -127,9 +127,17 @@ class Measure():
 	key = property(get_key, set_key)
 
 
-	def set_timesig(self, time_signature):
-		self.time_signature = time_signature
+	def set_timesig(self, timesig):
+		self._time_signature = TimeSignature(timesig)
 		return
+
+
+	def get_timesig(self):
+		timesig = self._time_signature
+		return timesig
+
+
+	time_signature = property(get_timesig, set_timesig)
 
 
 	def append_beat(self, beat):
