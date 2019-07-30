@@ -145,20 +145,22 @@ class Measure():
 		return self.beats
 
 
-	def add_event(self, event):
-		return
-
-
 
 class Beat():
 	def __init__(self, offset=0.):
 		self.offset = offset
 		self.notes = []
+		self.events = []
 
 
 	def append_note(self, note):
 		self.notes.append(note)
 		return self.notes
+
+
+	def add_event(self, event):
+		self.events.append(event)
+		return self.events
 
 
 
