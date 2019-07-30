@@ -52,12 +52,12 @@ class Song():
 	time_signature = property(get_timesig, set_timesig)
 
 
-	def set_keysig(self, keysig):
+	def set_key(self, keysig):
 		self._key = Key(keysig)
 		return key
 
 
-	def get_keysig(self):
+	def get_key(self):
 		keysig = self._key
 		return keysig
 
@@ -114,9 +114,17 @@ class Measure():
 		self.beats = []
 
 
-	def set_key(self, key):
-		self.key = key
+	def set_key(self, keysig):
+		self._key = Key(keysig)
 		return
+
+
+	def get_key(self):
+		keysig = self._key
+		return keysig
+
+
+	key = property(get_key, set_key)
 
 
 	def set_timesig(self, time_signature):
