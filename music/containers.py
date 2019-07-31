@@ -62,7 +62,7 @@ class Song():
 		return keysig
 
 
-	key = property(get_keysig, set_keysig)
+	key = property(get_key, set_key)
 
 
 	def add_track(self, track):
