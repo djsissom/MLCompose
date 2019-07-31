@@ -215,37 +215,34 @@ class Key(util.CheckArg):
 	Key class docstring.
 	'''
 	def __init__(self, key=None, accidentals=None, sharpflat=None, majmin=None):
-		self.strmap = {
-			'C_Maj':  (0, 0, 'Maj'),
-			'G_Maj':  (1, 1, 'Maj'),
-			'D_Maj':  (2, 1, 'Maj'),
-			# ...
-			'F_Maj':  (1, -1, 'Maj'),
-			'Bb_Maj': (2, -1, 'Maj'),
-			# ...
-			'A_min':  (0, 0, 'min'),
-			'E_min':  (1, 1, 'min'),
-			'B_min':  (2, 1, 'min'),
-			# ...
-			'D_min':  (1, -1, 'min'),
-			'G_min':  (2, -1, 'min'),
-		}
-		self.revmap = {v: k for k, v in strmap.items()}
-		self.accidentals = accidentals
-		self.sharp_flat = sharpflat
-		self.major_minor = majmin
-		if key is not None:
-			self.set(key)
+		self.majkeys = ('C', 'G', 'D', 'A', 'E', 'B', 'F#',
+		                'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F')
+		self.minkeys = ('A', 'E', 'B', 'F#', 'C#', 'G#', 'D#',
+		                'Eb', 'Bb', 'F', 'C', 'G', 'D')
+		if (key is None) and (accidentals is None) and (sharpflat is None) and (majmin is None):
+			self.accidentals = None
+			self.sharp_flat  = None
+			self.major_minor = None
+		else:
+			self.set(key, accidentals, sharpflat, majmin)
 
 
-	def set(self, key):
-		input_type = type(key)
-		case = {
-			str: self.parse_string,
-			tuple: self.parse_tuple
-		}
-		parse_func = case.get(input_type)
-		accs, sf, mm = parse_func(key)
+	def set(self, key=None, accidentals=None, sharpflat=None, majmin=None):
+		if (key is None):
+			if (accidentals is None) or (sharpflat is None) or (majmin is None):
+				raise(AttributeError("Must either specify key or all of accidentals, sharpflat, and majmin."))
+			else:
+				accs = accidentals
+				sf = sharpflat
+				mm = majmin
+		else:
+			input_type = type(key)
+			case = {
+				str: self.parse_string,
+				tuple: self.parse_tuple
+			}
+			parse_func = case.get(input_type)
+			accs, sf, mm = parse_func(key)
 		self.accidentals = accs
 		self.sharp_flat = sf
 		self.major_minor = mm
@@ -260,12 +257,75 @@ class Key(util.CheckArg):
 		return
 
 
+	def set_accidentals(self, accs):
+		accs = int(accs)
+		if accs > 6:
+			raise(AttributeError("Specified number of accidentals must be fewer than 7."))
+		self._accidentals = accs
+		return
+
+
+	def get_accidentals(self):
+		accs = self._accidentals
+		return accs
+
+
+	accidentals = property(get_accidentals, set_accidentals)
+	accs        = property(get_accidentals, set_accidentals)
+
+
+	def set_sharp_flat(self, sf):
+		if type(sf) is str:
+			if sf == '0':
+				sf = 0
+			elif (sf.lower == 'sharp') or (sf == '1'):
+				sf = 1
+			elif (sf.lower == 'flat') or (sf == '-1'):
+				sf = -1
+		if (sf is None) or (sf == 0) or (sf == 1) or (sf == -1):
+			self._sharp_flat = sf
+		else:
+			raise(AttributeError("Option sharpflat must be one of 0, 1, -1, 'sharp', or 'flat'."))
+		return
+
+
+	def get_sharp_flat(self):
+		sf = self._sharp_flat
+		return sf
+
+
+	sharp_flat = property(get_sharp_flat, set_sharp_flat)
+	sharpflat  = property(get_sharp_flat, set_sharp_flat)
+	sf         = property(get_sharp_flat, set_sharp_flat)
+
+
+	def set_major_minor(self, mm):
+		if type(mm) is str:
+			if (mm.lower == 'major') or (mm.lower == 'maj') or (mm == '0'):
+				mm = 0
+			elif (mm.lower == 'minor') or (mm.lower == 'min') or (mm == '1'):
+				mm = 1
+		if (mm == 0) or (mm == 1):
+			self._major_minor = mm
+		return
+
+
+	def get_major_minor(self):
+		mm = self._major_minor
+		return mm
+
+
+	major_minor = property(get_major_minor, set_major_minor)
+	majorminor  = property(get_major_minor, set_major_minor)
+	mm          = property(get_major_minor, set_major_minor)
+
+
 	def __str__(self):
 		accs = self.accidentals
 		sf = self.sharp_flat
 		mm = self.major_minor
 		if (accs is not None) and (sf is not None) and (mm is not None):
-			repstring = revmap[(accs, sf, mm)]
+			repstring = revmap[(accs, sf, mm)] # TODO: this needs updating
 		else:
 			repstring = 'Uninitialized time signature'
 		return repstring
