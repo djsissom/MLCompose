@@ -214,8 +214,61 @@ class Key(util.CheckArg):
 	'''
 	Key class docstring.
 	'''
-	def __init__(self, key=None):
-		pass
+	def __init__(self, key=None, accidentals=None, sharpflat=None, majmin=None):
+		self.strmap = {
+			'C_Maj':  (0, 0, 'Maj'),
+			'G_Maj':  (1, 1, 'Maj'),
+			'D_Maj':  (2, 1, 'Maj'),
+			# ...
+			'F_Maj':  (1, -1, 'Maj'),
+			'Bb_Maj': (2, -1, 'Maj'),
+			# ...
+			'A_min':  (0, 0, 'min'),
+			'E_min':  (1, 1, 'min'),
+			'B_min':  (2, 1, 'min'),
+			# ...
+			'D_min':  (1, -1, 'min'),
+			'G_min':  (2, -1, 'min'),
+		}
+		self.revmap = {v: k for k, v in strmap.items()}
+		self.accidentals = accidentals
+		self.sharp_flat = sharpflat
+		self.major_minor = majmin
+		if key is not None:
+			self.set(key)
+
+
+	def set(self, key):
+		input_type = type(key)
+		case = {
+			str: self.parse_string,
+			tuple: self.parse_tuple
+		}
+		parse_func = case.get(input_type)
+		accs, sf, mm = parse_func(key)
+		self.accidentals = accs
+		self.sharp_flat = sf
+		self.major_minor = mm
+		return self
+
+
+	def parse_string(self, key):
+		return
+
+
+	def parse_tuple(self, key):
+		return
+
+
+	def __str__(self):
+		accs = self.accidentals
+		sf = self.sharp_flat
+		mm = self.major_minor
+		if (accs is not None) and (sf is not None) and (mm is not None):
+			repstring = revmap[(accs, sf, mm)]
+		else:
+			repstring = 'Uninitialized time signature'
+		return repstring
 
 
 
