@@ -258,9 +258,10 @@ class Key(util.CheckArg):
 
 
 	def set_accidentals(self, accs):
-		accs = int(accs)
-		if accs > 6:
-			raise(AttributeError("Specified number of accidentals must be fewer than 7."))
+		if accs is not None:
+			accs = int(accs)
+			if accs > 6:
+				raise(AttributeError("Specified number of accidentals must be fewer than 7."))
 		self._accidentals = accs
 		return
 
@@ -278,9 +279,9 @@ class Key(util.CheckArg):
 		if type(sf) is str:
 			if sf == '0':
 				sf = 0
-			elif (sf.lower == 'sharp') or (sf == '1'):
+			elif (sf.lower() == 'sharp') or (sf == '1'):
 				sf = 1
-			elif (sf.lower == 'flat') or (sf == '-1'):
+			elif (sf.lower() == 'flat') or (sf == '-1'):
 				sf = -1
 		if (sf is None) or (sf == 0) or (sf == 1) or (sf == -1):
 			self._sharp_flat = sf
@@ -301,11 +302,11 @@ class Key(util.CheckArg):
 
 	def set_major_minor(self, mm):
 		if type(mm) is str:
-			if (mm.lower == 'major') or (mm.lower == 'maj') or (mm == '0'):
+			if (mm.lower() == 'major') or (mm.lower() == 'maj') or (mm == '0'):
 				mm = 0
-			elif (mm.lower == 'minor') or (mm.lower == 'min') or (mm == '1'):
+			elif (mm.lower() == 'minor') or (mm.lower() == 'min') or (mm == '1'):
 				mm = 1
-		if (mm == 0) or (mm == 1):
+		if (mm is None) or (mm == 0) or (mm == 1):
 			self._major_minor = mm
 		return
 
@@ -325,7 +326,9 @@ class Key(util.CheckArg):
 		sf = self.sharp_flat
 		mm = self.major_minor
 		if (accs is not None) and (sf is not None) and (mm is not None):
-			repstring = revmap[(accs, sf, mm)] # TODO: this needs updating
+			keylist = (self.majkeys, self.minkeys)[mm]
+			mm_string = ('_Maj', '_min')[mm]
+			repstring = keylist[sf * accs] + mm_string
 		else:
 			repstring = 'Uninitialized time signature'
 		return repstring
