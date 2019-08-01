@@ -215,10 +215,10 @@ class Key(util.CheckArg):
 	Key class docstring.
 	'''
 	def __init__(self, key=None, accidentals=None, sharpflat=None, majmin=None):
-		self.majkeys = ('C', 'G', 'D', 'A', 'E', 'B', 'F#',
-		                'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F')
-		self.minkeys = ('A', 'E', 'B', 'F#', 'C#', 'G#', 'D#',
-		                'Eb', 'Bb', 'F', 'C', 'G', 'D')
+		self.majkeys = ('C', 'G',  'D',  'A',  'E',  'B',  'F#',
+		                     'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F')
+		self.minkeys = ('A', 'E',  'B',  'F#', 'C#', 'G#', 'D#',
+		                     'Eb', 'Bb', 'F',  'C',  'G',  'D')
 		if (key is None) and (accidentals is None) and (sharpflat is None) and (majmin is None):
 			self.accidentals = None
 			self.sharp_flat  = None
@@ -250,11 +250,45 @@ class Key(util.CheckArg):
 
 
 	def parse_string(self, key):
-		return
+		mm_string = key[-3:]
+		if mm_string.lower() == 'maj':
+			mm = 0
+			keylist = self.majkeys
+		elif mm_string.lower() == 'min':
+			mm = 1
+			keylist = self.minkeys
+		else:
+			raise(AttributeError("String used to initialize Key class must end in 'Maj', or 'min' (case-insensitive)."))
+
+		if (key[1] == 'b') or (key[1] == '#'):
+			namelen = 2
+		else:
+			namelen = 1
+		keyname = key[:namelen]
+		indexlist = [i for i, x in enumerate(keylist) if x.lower() == keyname.lower()]
+		if len(indexlist) == 1:
+			index = indexlist[0]
+		else:
+			print("you passed " + keyname)
+			print(indexlist)
+			raise(AttributeError("%s key name must be one of %s" % (mm_string, str(keylist))))
+
+		if index > 6:
+			accs = len(keylist) - index
+			sf = -1
+		elif index == 0:
+			accs = 0
+			sf = 0
+		else:
+			accs = index
+			sf = 1
+
+		return accs, sf, mm
 
 
 	def parse_tuple(self, key):
-		return
+		accs, sf, mm = key[:]
+		return accs, sf, mm
 
 
 	def set_accidentals(self, accs):
