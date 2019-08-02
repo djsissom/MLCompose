@@ -212,7 +212,18 @@ class Event():
 
 class Key(util.CheckArg):
 	'''
-	Key class docstring.
+	Key(key=None, accidentals=None, sharpflat=None, majmin=None)
+
+	Create a Key object.  If no parameters are given, creates an uninitialized
+	instance.  Can be (re-)initialized with the set() method with the same
+	parameters.
+
+	Parameters
+	----------
+	key : str, tuple, or Key instance (optional)
+	accidentals : int <= 6 (optional)
+	sharpflat : {0, 1, -1, 'sharp', 'flat'} (optional)
+	majmin: {0, 1, 'major', 'maj', 'minor', 'min'} (optional)
 	'''
 	def __init__(self, key=None, accidentals=None, sharpflat=None, majmin=None):
 		self.majkeys = ('C', 'G',  'D',  'A',  'E',  'B',  'F#',
