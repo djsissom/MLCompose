@@ -186,16 +186,6 @@ class Note():
 		self.tie = tie
 
 
-	def degree_to_note(self, degree):
-		note = degree  # TODO: add conversion
-		return note
-
-
-	def note_to_degree(self, note):
-		degree = note  # TODO: add conversion
-		return degree
-
-
 
 class Rest():
 	def __init__(self, duration=None):
@@ -230,6 +220,8 @@ class Key(util.CheckArg):
 		                     'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F')
 		self.minkeys = ('A', 'E',  'B',  'F#', 'C#', 'G#', 'D#',
 		                     'Eb', 'Bb', 'F',  'C',  'G',  'D')
+		self.sharps = ('F', 'C', 'G', 'D', 'A', 'E')
+		self.flats =  ('B', 'E', 'A', 'D', 'G', 'C')
 		if (key is None) and (accidentals is None) and (sharpflat is None) and (majmin is None):
 			self.accidentals = None
 			self.sharp_flat  = None
@@ -364,6 +356,16 @@ class Key(util.CheckArg):
 	major_minor = property(get_major_minor, set_major_minor)
 	majorminor  = property(get_major_minor, set_major_minor)
 	mm          = property(get_major_minor, set_major_minor)
+
+
+	def degree_to_note(self, degree):
+		note = degree  # TODO: add conversion
+		return note
+
+
+	def note_to_degree(self, note):
+		degree = note  # TODO: add conversion
+		return degree
 
 
 	def __str__(self):
