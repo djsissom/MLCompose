@@ -224,8 +224,9 @@ class Key(util.CheckArg):
 		self.flats =  ('B', 'E', 'A', 'D', 'G', 'C')
 		if (key is None) and (naccidentals is None) and (sharpflat is None) and (majmin is None):
 			self.naccidentals = None
-			self.sharp_flat  = None
-			self.major_minor = None
+			self.sharp_flat   = None
+			self.major_minor  = None
+			self.accidentals  = None
 		else:
 			self.set(key, naccidentals, sharpflat, majmin)
 
@@ -249,6 +250,7 @@ class Key(util.CheckArg):
 		self.naccidentals = naccs
 		self.sharp_flat = sf
 		self.major_minor = mm
+		self.set_accidentals()
 		return self
 
 
@@ -358,6 +360,20 @@ class Key(util.CheckArg):
 	major_minor = property(get_major_minor, set_major_minor)
 	majorminor  = property(get_major_minor, set_major_minor)
 	mm          = property(get_major_minor, set_major_minor)
+
+
+	def set_accidentals(self):
+		naccs = self.naccidentals
+		sf = self.sharp_flat
+		if naccs == 0 and sf == 0:
+			self.accidentals = ()
+		else:
+			if sf == 1:
+				acclist = self.sharps
+			elif sf == -1:
+				acclist = self.flats
+			self.accidentals = acclist[:naccs]
+		return
 
 
 	def degree_to_note(self, degree):
