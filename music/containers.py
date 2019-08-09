@@ -202,7 +202,7 @@ class Event():
 
 class Key(util.CheckArg):
 	'''
-	Key(key=None, accidentals=None, sharpflat=None, majmin=None)
+	Key(key=None, naccidentals=None, sharpflat=None, majmin=None)
 
 	Create a Key object.  If no parameters are given, creates an uninitialized
 	instance.  Can be (re-)initialized with the set() method with the same
@@ -211,31 +211,31 @@ class Key(util.CheckArg):
 	Parameters
 	----------
 	key : str, tuple, or Key instance (optional)
-	accidentals : int <= 6 (optional)
+	naccidentals : int <= 6 (optional)
 	sharpflat : {0, 1, -1, 'sharp', 'flat'} (optional)
 	majmin: {0, 1, 'major', 'maj', 'minor', 'min'} (optional)
 	'''
-	def __init__(self, key=None, accidentals=None, sharpflat=None, majmin=None):
+	def __init__(self, key=None, naccidentals=None, sharpflat=None, majmin=None):
 		self.majkeys = ('C', 'G',  'D',  'A',  'E',  'B',  'F#',
 		                     'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F')
 		self.minkeys = ('A', 'E',  'B',  'F#', 'C#', 'G#', 'D#',
 		                     'Eb', 'Bb', 'F',  'C',  'G',  'D')
 		self.sharps = ('F', 'C', 'G', 'D', 'A', 'E')
 		self.flats =  ('B', 'E', 'A', 'D', 'G', 'C')
-		if (key is None) and (accidentals is None) and (sharpflat is None) and (majmin is None):
-			self.accidentals = None
+		if (key is None) and (naccidentals is None) and (sharpflat is None) and (majmin is None):
+			self.naccidentals = None
 			self.sharp_flat  = None
 			self.major_minor = None
 		else:
-			self.set(key, accidentals, sharpflat, majmin)
+			self.set(key, naccidentals, sharpflat, majmin)
 
 
-	def set(self, key=None, accidentals=None, sharpflat=None, majmin=None):
+	def set(self, key=None, naccidentals=None, sharpflat=None, majmin=None):
 		if (key is None):
-			if (accidentals is None) or (sharpflat is None) or (majmin is None):
-				raise(AttributeError("Must either specify key or all of accidentals, sharpflat, and majmin."))
+			if (naccidentals is None) or (sharpflat is None) or (majmin is None):
+				raise(AttributeError("Must either specify key or all of naccidentals, sharpflat, and majmin."))
 			else:
-				accs = accidentals
+				naccs = naccidentals
 				sf = sharpflat
 				mm = majmin
 		else:
@@ -245,8 +245,8 @@ class Key(util.CheckArg):
 				tuple: self.parse_tuple
 			}
 			parse_func = case.get(input_type)
-			accs, sf, mm = parse_func(key)
-		self.accidentals = accs
+			naccs, sf, mm = parse_func(key)
+		self.naccidentals = naccs
 		self.sharp_flat = sf
 		self.major_minor = mm
 		return self
@@ -277,39 +277,41 @@ class Key(util.CheckArg):
 			raise(AttributeError("%s key name must be one of %s" % (mm_string, str(keylist))))
 
 		if index > 6:
-			accs = len(keylist) - index
+			naccs = len(keylist) - index
 			sf = -1
 		elif index == 0:
-			accs = 0
+			naccs = 0
 			sf = 0
 		else:
-			accs = index
+			naccs = index
 			sf = 1
 
-		return accs, sf, mm
+		return naccs, sf, mm
 
 
 	def parse_tuple(self, key):
-		accs, sf, mm = key[:]
-		return accs, sf, mm
+		naccs, sf, mm = key[:]
+		return naccs, sf, mm
 
 
-	def set_accidentals(self, accs):
-		if accs is not None:
-			accs = int(accs)
-			if accs > 6:
-				raise(AttributeError("Specified number of accidentals must be fewer than 7."))
-		self._accidentals = accs
+	def set_naccidentals(self, naccs):
+		if naccs is not None:
+			naccs = int(naccs)
+			if naccs > 6:
+				raise(AttributeError("Specified number of naccidentals must be fewer than 7."))
+		self._naccidentals = naccs
 		return
 
 
-	def get_accidentals(self):
-		accs = self._accidentals
-		return accs
+	def get_naccidentals(self):
+		naccs = self._naccidentals
+		return naccs
 
 
-	accidentals = property(get_accidentals, set_accidentals)
-	accs        = property(get_accidentals, set_accidentals)
+	n_accidentals = property(get_naccidentals, set_naccidentals)
+	naccidentals  = property(get_naccidentals, set_naccidentals)
+	n_accs        = property(get_naccidentals, set_naccidentals)
+	naccs         = property(get_naccidentals, set_naccidentals)
 
 
 	def set_sharp_flat(self, sf):
@@ -369,13 +371,13 @@ class Key(util.CheckArg):
 
 
 	def __str__(self):
-		accs = self.accidentals
+		naccs = self.naccidentals
 		sf = self.sharp_flat
 		mm = self.major_minor
-		if (accs is not None) and (sf is not None) and (mm is not None):
+		if (naccs is not None) and (sf is not None) and (mm is not None):
 			keylist = (self.majkeys, self.minkeys)[mm]
 			mm_string = ('_Maj', '_min')[mm]
-			repstring = keylist[sf * accs] + mm_string
+			repstring = keylist[sf * naccs] + mm_string
 		else:
 			repstring = 'Uninitialized time signature'
 		return repstring
