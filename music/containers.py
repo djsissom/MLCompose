@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+from itertools import cycle
 from ipdb import set_trace
 
 from .. import util
@@ -222,11 +223,13 @@ class Key(util.CheckArg):
 		                     'Eb', 'Bb', 'F',  'C',  'G',  'D')
 		self.sharps = ('F', 'C', 'G', 'D', 'A', 'E')
 		self.flats =  ('B', 'E', 'A', 'D', 'G', 'C')
+		self.allnotes = ('A', 'B', 'C', 'D', 'E', 'F', 'G')
 		if (key is None) and (naccidentals is None) and (sharpflat is None) and (majmin is None):
 			self.naccidentals = None
 			self.sharp_flat   = None
 			self.major_minor  = None
 			self.accidentals  = None
+			self.notes        = None
 		else:
 			self.set(key, naccidentals, sharpflat, majmin)
 
@@ -251,6 +254,7 @@ class Key(util.CheckArg):
 		self.sharp_flat = sf
 		self.major_minor = mm
 		self.set_accidentals()
+		self.set_notes()
 		return self
 
 
@@ -373,6 +377,27 @@ class Key(util.CheckArg):
 			elif sf == -1:
 				acclist = self.flats
 			self.accidentals = acclist[:naccs]
+		return
+
+
+	def set_notes(self):
+		notecycle = cycle(self.allnotes)
+		keyname = str(self)
+		basenote = keyname[0]
+
+		nextnote = next(notecycle)
+		while basenote != nextnote:
+			nextnote = next(notecycle)
+
+		notes = []
+		acc_strings = ['', '#', 'b']
+		while len(notes) < 7:
+			if nextnote in self.accidentals:
+				acc_string = acc_strings[self.sharpflat]
+				nextnote = nextnote + acc_string
+			notes.append(nextnote)
+			nextnote = next(notecycle)
+		self.notes = tuple(notes)
 		return
 
 
