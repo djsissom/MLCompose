@@ -237,7 +237,7 @@ class Key(util.CheckArg):
 	def set(self, key=None, naccidentals=None, sharpflat=None, majmin=None):
 		if (key is None):
 			if (naccidentals is None) or (sharpflat is None) or (majmin is None):
-				raise(AttributeError("Must either specify key or all of naccidentals, sharpflat, and majmin."))
+				raise AttributeError("Must either specify key or all of naccidentals, sharpflat, and majmin.")
 			else:
 				naccs = naccidentals
 				sf = sharpflat
@@ -267,7 +267,7 @@ class Key(util.CheckArg):
 			mm = 1
 			keylist = self.minkeys
 		else:
-			raise(AttributeError("String used to initialize Key class must end in 'Maj', or 'min' (case-insensitive)."))
+			raise AttributeError("String used to initialize Key class must end in 'Maj', or 'min' (case-insensitive).")
 
 		if (key[1] == 'b') or (key[1] == '#'):
 			namelen = 2
@@ -280,7 +280,7 @@ class Key(util.CheckArg):
 		else:
 			print("you passed " + keyname)
 			print(indexlist)
-			raise(AttributeError("%s key name must be one of %s" % (mm_string, str(keylist))))
+			raise AttributeError("%s key name must be one of %s" % (mm_string, str(keylist)))
 
 		if index > 6:
 			naccs = len(keylist) - index
@@ -304,7 +304,7 @@ class Key(util.CheckArg):
 		if naccs is not None:
 			naccs = int(naccs)
 			if naccs > 6:
-				raise(AttributeError("Specified number of naccidentals must be fewer than 7."))
+				raise AttributeError("Specified number of naccidentals must be fewer than 7.")
 		self._naccidentals = naccs
 		return
 
@@ -331,7 +331,7 @@ class Key(util.CheckArg):
 		if (sf is None) or (sf == 0) or (sf == 1) or (sf == -1):
 			self._sharp_flat = sf
 		else:
-			raise(AttributeError("Option sharpflat must be one of 0, 1, -1, 'sharp', or 'flat'."))
+			raise AttributeError("Option sharpflat must be one of 0, 1, -1, 'sharp', or 'flat'.")
 		return
 
 
