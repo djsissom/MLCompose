@@ -402,12 +402,18 @@ class Key(util.CheckArg):
 
 
 	def degree_to_note(self, degree):
-		note = degree  # TODO: add conversion
+		# scale degrees start at 1
+		note = self.notes[degree-1]
 		return note
 
 
 	def note_to_degree(self, note):
-		degree = note  # TODO: add conversion
+		# scale degrees start at 1
+		note = str(note)
+		if note in self.notes:
+			degree = self.notes.index(note) + 1
+		else:
+			raise AttributeError("Provided note is not in the key.")
 		return degree
 
 
