@@ -178,13 +178,67 @@ class Beat():
 
 
 
-class Note():
-	def __init__(self, value=None, octave=None, duration=None, intensity=None, tie=None):
-		self.value = value
+class Note(util.CheckArg):
+	def __init__(self, note=None, name=None, value=None, octave=None, duration=None, intensity=None, tie=None):
+		self.sharpnames = ('C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B')
+		self.flatnames  = ('C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B')
+		if (note is None) and (name is None) and (value is None) and (octave is None) \
+		                  and (duration is None) and (intensity is None) and (tie is None):
+			self.name      = None
+			self.value     = None
+			self.octave    = None
+			self.duration  = None
+			self.intensity = None
+			self.tie       = None
+		else:
+			self.set(note, name, value, octave, duration, intensity, tie)
+
+
+	def set(self, note=None, name=None, value=None, octave=None, duration=None, intensity=None, tie=None):
+		if note is None:
+			if value is None:
+				if (name is None) or (octave is None):
+					raise AttributeError("Must specify either the numerical value or the name and octave of note.")
+				else:
+					_name = name
+					_octave = octave
+			else:
+				self.value = value
+		else:
+			input_type = type(key)
+			case = {
+				str: self.parse_string,
+				tuple: self.parse_tuple
+			}
+			parse_func = case.get(input_type)
+			_name, _octave = parse_func(key)
+		self.name = name
 		self.octave = octave
-		self.duration = duration
-		self.intensity = intensity
-		self.tie = tie
+		return self
+
+
+	def parse_string(self, note):
+		return
+
+
+	def parse_tuple(self, note):
+		return
+
+
+	def raise_note(self, degree='halfstep'):
+		return
+
+
+	def lower_note(self, degree='halfstep'):
+		return
+
+
+	def raise_octave(self, degree=1):
+		return
+
+
+	def lower_octave(self, degree=1):
+		return
 
 
 
@@ -235,7 +289,7 @@ class Key(util.CheckArg):
 
 
 	def set(self, key=None, naccidentals=None, sharpflat=None, majmin=None):
-		if (key is None):
+		if key is None:
 			if (naccidentals is None) or (sharpflat is None) or (majmin is None):
 				raise AttributeError("Must either specify key or all of naccidentals, sharpflat, and majmin.")
 			else:
