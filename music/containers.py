@@ -184,9 +184,7 @@ class Note(util.CheckArg):
 		self.flatnames  = ('C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B')
 		if (note is None) and (name is None) and (value is None) and (octave is None) \
 		                  and (duration is None) and (intensity is None) and (tie is None):
-			self.name      = None
 			self.value     = None
-			self.octave    = None
 			self.duration  = None
 			self.intensity = None
 			self.tie       = None
@@ -200,8 +198,8 @@ class Note(util.CheckArg):
 				if (name is None) or (octave is None):
 					raise AttributeError("Must specify either the numerical value or the name and octave of note.")
 				else:
-					_name = name
-					_octave = octave
+					self.name = name
+					self.octave = octave
 			else:
 				self.value = value
 		else:
@@ -211,9 +209,11 @@ class Note(util.CheckArg):
 				tuple: self.parse_tuple
 			}
 			parse_func = case.get(input_type)
-			_name, _octave = parse_func(key)
-		self.name = name
-		self.octave = octave
+			value, duration, intensity, tie = parse_func(key)
+		self.value = value
+		self.duration = duration
+		self.intensity = intensity
+		self.tie = tie
 		return self
 
 
@@ -223,6 +223,56 @@ class Note(util.CheckArg):
 
 	def parse_tuple(self, note):
 		return
+
+
+	def set_value(self, value):
+		if (value is not None) and ((value < 0) or (value > 127)):
+			raise AttributeError("Note value must be in the range 0-127 (inclusive).")
+		self._value = value
+		return
+
+
+	def get_value(self):
+		value = self._value
+		return value
+
+
+	value = property(get_value, set_value)
+
+
+	def set_name(self, name):
+		if name in self.sharpnames:
+			names = self.sharpnames
+		elif name in self.flatnames:
+			names = self.flatnames
+		else:
+			raise AttributeError("Invalid note name supplied.")
+		index = names.index(name)
+		if self.value is None:
+			octave = 0
+		else:
+			x = self.value
+			octave = int(x / 12)
+		self._value = index + (12 * octave)
+		return
+
+
+	def get_name(self, enharmonic='sharp'):
+		if self.value is None:
+			name = None
+		else:
+			if enharmonic.lower() in ('sharp', 's', '#'):
+				names = self.sharpnames
+			elif enharmonic.lower() in ('flat', 'f', 'b'):
+				names = self.flatnames
+			cycleval = self.value
+			while cycleval >= 12:
+				cycleval = cycleval - 12
+			name = names[cycleval]
+		return name
+
+
+	name = property(get_name, set_name)
 
 
 	def raise_note(self, degree='halfstep'):
