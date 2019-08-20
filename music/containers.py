@@ -179,42 +179,48 @@ class Beat():
 
 
 class Note(util.CheckArg):
-	def __init__(self, note=None, name=None, value=None, octave=None, duration=None, intensity=None, tie=None):
+	def __init__(self, note=None, octave=5, duration=1, intensity=1.0, tie=False, name=None, value=None):
 		self.sharpnames = ('C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B')
 		self.flatnames  = ('C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B')
-		if (note is None) and (name is None) and (value is None) and (octave is None) \
-		                  and (duration is None) and (intensity is None) and (tie is None):
+		if (note is None) and (name is None) and (value is None):
 			self.value     = None
-			self.duration  = None
-			self.intensity = None
-			self.tie       = None
+			self.duration  = duration
+			self.intensity = intensity
+			self.tie       = tie
 		else:
-			self.set(note, name, value, octave, duration, intensity, tie)
+			self.set(note, octave, duration, intensity, tie, name, value)
 
 
-	def set(self, note=None, name=None, value=None, octave=None, duration=None, intensity=None, tie=None):
-		if note is None:
-			if value is None:
-				if (name is None) or (octave is None):
-					raise AttributeError("Must specify either the numerical value or the name and octave of note.")
-				else:
-					self.name = name
-					self.octave = octave
-			else:
-				self.value = value
-		else:
+	def set(self, note=None, octave=5, duration=1, intensity=1.0, tie=False, name=None, value=None):
+		if note is not None:
 			input_type = type(key)
 			case = {
+				int: self.parse_int,
 				str: self.parse_string,
 				tuple: self.parse_tuple
 			}
 			parse_func = case.get(input_type)
-			value, duration, intensity, tie = parse_func(key)
-		self.value = value
+			value = parse_func(note)
+
+		if value is None:
+			if name is None:
+				raise AttributeError("Must specify either the note name or numerical value.")
+			else:
+				self.name = name
+				self.octave = octave
+		else:
+			if value < 12:
+				value = value + (12 * octave)
+			self.value = value
+
 		self.duration = duration
 		self.intensity = intensity
 		self.tie = tie
 		return self
+
+
+	def parse_int(self, note):
+		return
 
 
 	def parse_string(self, note):
