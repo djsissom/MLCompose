@@ -182,6 +182,7 @@ class Note(util.CheckArg):
 	def __init__(self, note=None, octave=5, duration=1, intensity=1.0, tie=False, name=None, value=None):
 		self.sharpnames = ('C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B')
 		self.flatnames  = ('C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B')
+		self._value = None
 		if (note is None) and (name is None) and (value is None):
 			self.value     = None
 			self.duration  = duration
@@ -220,7 +221,8 @@ class Note(util.CheckArg):
 
 
 	def parse_int(self, note):
-		return
+		value = note
+		return value
 
 
 	def parse_string(self, note):
@@ -281,19 +283,60 @@ class Note(util.CheckArg):
 	name = property(get_name, set_name)
 
 
+	def set_octave(self, octave):
+		value = self.value
+		old_octave = self.octave
+		octave_diff = octave - old_octave
+		self.value = value + (12 * octave_diff)
+		return
+
+
+	def get_octave(self):
+		value = self.value
+		octave = int(value / 12)
+		return octave
+
+
+	octave = property(get_octave, set_octave)
+
+
 	def raise_note(self, degree='halfstep'):
+		degree = parse_step_degree(degree)
+		value = self.value
+		value = value + degree
+		self.value = value
 		return
 
 
 	def lower_note(self, degree='halfstep'):
+		degree = parse_step_degree(degree)
+		value = self.value
+		value = value - degree
+		self.value = value
 		return
 
 
+	def parse_step_degree(self, degree):
+		if degree.lower() == 'halfstep':
+			degree = 1
+		elif degree.lower() == 'wholestep':
+			degree = 2
+		if type(degree) is not int:
+			raise AttributeError("Degree must be 'halfstep', 'wholestep', or integer number of halfsteps.")
+		return degree
+
+
 	def raise_octave(self, degree=1):
+		octave = self.octave
+		octave = octave + degree
+		self.octave = octave
 		return
 
 
 	def lower_octave(self, degree=1):
+		octave = self.octave
+		octave = octave - degree
+		self.octave = octave
 		return
 
 
