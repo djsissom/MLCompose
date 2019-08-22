@@ -179,20 +179,26 @@ class Beat():
 
 
 class Note(util.CheckArg):
-	def __init__(self, note=None, octave=5, duration=1, intensity=1.0, tie=False, name=None, value=None):
+	def __init__(self, note=None, octave=5, duration=1, intensity=1.0, tie=False, enharmonic=None, name=None, value=None):
 		self.sharpnames = ('C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B')
 		self.flatnames  = ('C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B')
 		self._value = None
 		if (note is None) and (name is None) and (value is None):
-			self.value     = None
-			self.duration  = duration
-			self.intensity = intensity
-			self.tie       = tie
+			self.value      = None
+			self.duration   = duration
+			self.intensity  = intensity
+			self.tie        = tie
+			self.enharmonic = enharmonic
 		else:
-			self.set(note, octave, duration, intensity, tie, name, value)
+			self.set(note, octave, duration, intensity, tie, enharmonic, name, value)
 
 
-	def set(self, note=None, octave=5, duration=1, intensity=1.0, tie=False, name=None, value=None):
+	def set(self, note=None, octave=5, duration=1, intensity=1.0, tie=False, enharmonic=None, name=None, value=None):
+		self.duration   = duration
+		self.intensity  = intensity
+		self.tie        = tie
+		self.enharmonic = enharmonic
+
 		if note is not None:
 			input_type = type(key)
 			case = {
@@ -214,9 +220,6 @@ class Note(util.CheckArg):
 				value = value + (12 * octave)
 			self.value = value
 
-		self.duration = duration
-		self.intensity = intensity
-		self.tie = tie
 		return self
 
 
@@ -249,12 +252,19 @@ class Note(util.CheckArg):
 
 
 	def set_name(self, name):
-		if name in self.sharpnames:
-			names = self.sharpnames
-		elif name in self.flatnames:
-			names = self.flatnames
+		en = self.enharmonic
+		if (name in self.sharpnames) or (name in self.flatnames):
+			if (name in self.sharpnames) and ((en is None) or (en.lower() in ('sharp', 's', '#'))):
+					names = self.sharpnames
+					if en is None:
+						self.enharmonic = 'sharp'
+			elif (name in self.flatnames) and ((en is None) or (en.lower() in ('flat', 'f', 'b'))):
+					names = self.flatnames
+					if en is None:
+						self.enharmonic = 'flat'
 		else:
 			raise AttributeError("Invalid note name supplied.")
+
 		index = names.index(name)
 		if self.value is None:
 			octave = 0
@@ -265,14 +275,18 @@ class Note(util.CheckArg):
 		return
 
 
-	def get_name(self, enharmonic='sharp'):
+	def get_name(self, enharmonic=None):
 		if self.value is None:
 			name = None
 		else:
-			if enharmonic.lower() in ('sharp', 's', '#'):
+			if enharmonic is None:
+				enharmonic = self.enharmonic
+
+			if (enharmonic is None) or (enharmonic.lower() in ('sharp', 's', '#')):
 				names = self.sharpnames
 			elif enharmonic.lower() in ('flat', 'f', 'b'):
 				names = self.flatnames
+
 			cycleval = self.value
 			while cycleval >= 12:
 				cycleval = cycleval - 12
