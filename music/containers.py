@@ -315,7 +315,7 @@ class Note(util.CheckArg):
 
 
 	def raise_note(self, degree='halfstep'):
-		degree = parse_step_degree(degree)
+		degree = self.parse_step_degree(degree)
 		value = self.value
 		value = value + degree
 		self.value = value
@@ -323,7 +323,7 @@ class Note(util.CheckArg):
 
 
 	def lower_note(self, degree='halfstep'):
-		degree = parse_step_degree(degree)
+		degree = self.parse_step_degree(degree)
 		value = self.value
 		value = value - degree
 		self.value = value
