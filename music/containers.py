@@ -200,14 +200,21 @@ class Note(util.CheckArg):
 		self.enharmonic = enharmonic
 
 		if note is not None:
-			input_type = type(key)
+			input_type = type(note)
 			case = {
 				int: self.parse_int,
 				str: self.parse_string,
 				tuple: self.parse_tuple
 			}
 			parse_func = case.get(input_type)
-			value = parse_func(note)
+			note, tmp_octave = parse_func(note)
+			if type(note) is str:
+				name = note
+			elif type(note) is int:
+				value = note
+
+			if tmp_octave is not None:
+				octave = tmp_octave
 
 		if value is None:
 			if name is None:
@@ -225,15 +232,39 @@ class Note(util.CheckArg):
 
 	def parse_int(self, note):
 		value = note
-		return value
+		return value, None
 
 
 	def parse_string(self, note):
-		return
+		name = note
+		octave = None
+		for sep in (':', '-', '_'):
+			if sep in note:
+				name, octave = note.split(sep)
+				octave = int(octave)
+		return name, octave
 
 
 	def parse_tuple(self, note):
-		return
+		if len(note) == 2:
+			octave = note[1]
+			note = note[0]
+		elif len(note) == 1:
+			note = note[0]
+			octave = None
+		else:
+			raise AttributeError("Tuples passed as note argument should be length 1 or 2.")
+
+		input_type = type(note)
+		case = {
+			int: self.parse_int,
+			str: self.parse_string
+		}
+		parse_func = case.get(input_type)
+		note, tmp_octave = parse_func(note)
+		if octave is None:
+			octave = tmp_octave
+		return note, octave
 
 
 	def set_value(self, value):
@@ -300,7 +331,7 @@ class Note(util.CheckArg):
 	def set_octave(self, octave):
 		value = self.value
 		old_octave = self.octave
-		octave_diff = octave - old_octave
+		octave_diff = int(octave) - old_octave
 		self.value = value + (12 * octave_diff)
 		return
 
