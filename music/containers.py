@@ -354,6 +354,11 @@ class Note(util.CheckArg):
 		return
 
 
+	def __str__(self):
+		repstring = self.name + '_' + str(self.octave)
+		return repstring
+
+
 
 class Rest():
 	def __init__(self, duration=None):
