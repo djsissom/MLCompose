@@ -255,13 +255,13 @@ class Note(util.CheckArg):
 		en = self.enharmonic
 		if (name in self.sharpnames) or (name in self.flatnames):
 			if (name in self.sharpnames) and ((en is None) or (en.lower() in ('sharp', 's', '#'))):
-					names = self.sharpnames
-					if en is None:
-						self.enharmonic = 'sharp'
+				names = self.sharpnames
+				if en is None:
+					self.enharmonic = 'sharp'
 			elif (name in self.flatnames) and ((en is None) or (en.lower() in ('flat', 'f', 'b'))):
-					names = self.flatnames
-					if en is None:
-						self.enharmonic = 'flat'
+				names = self.flatnames
+				if en is None:
+					self.enharmonic = 'flat'
 		else:
 			raise AttributeError("Invalid note name supplied.")
 
