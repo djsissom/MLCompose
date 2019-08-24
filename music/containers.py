@@ -345,6 +345,54 @@ class Note(util.CheckArg):
 	octave = property(get_octave, set_octave)
 
 
+	def set_duration(self, duration):
+		self._duration = duration
+		return
+
+
+	def get_duration(self):
+		return self._duration
+
+
+	duration = property(get_duration, set_duration)
+
+
+	def set_intensity(self, intensity):
+		self._intensity = intensity
+		return
+
+
+	def get_intensity(self):
+		return self._intensity
+
+
+	intensity = property(get_intensity, set_intensity)
+
+
+	def set_tie(self, tie):
+		self._tie = tie
+		return
+
+
+	def get_tie(self):
+		return self._tie
+
+
+	tie = property(get_tie, set_tie)
+
+
+	def set_enharmonic(self, enharmonic):
+		self._enharmonic = enharmonic
+		return
+
+
+	def get_enharmonic(self):
+		return self._enharmonic
+
+
+	enharmonic = property(get_enharmonic, set_enharmonic)
+
+
 	def raise_note(self, degree='halfstep'):
 		degree = self.parse_step_degree(degree)
 		value = self.value
