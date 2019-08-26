@@ -358,6 +358,8 @@ class Note(util.CheckArg):
 
 
 	def set_intensity(self, intensity):
+		if (intensity < 0) or (intensity > 1):
+			raise AttributeError("Intensity should be within the interval [0,1] (inclusive)."
 		self._intensity = intensity
 		return
 
@@ -370,6 +372,13 @@ class Note(util.CheckArg):
 
 
 	def set_tie(self, tie):
+		if type(tie) is not bool:
+			if str(tie).lower() in ('true', 't', 'yes', 'y', '1', 'on'):
+				tie = True
+			elif str(tie).lower() in ('false', 'f', 'no', 'n', '0', 'off'):
+				tie = False
+			else:
+				raise AttributeError("Unable to parse 'tie' option.")
 		self._tie = tie
 		return
 
@@ -382,6 +391,12 @@ class Note(util.CheckArg):
 
 
 	def set_enharmonic(self, enharmonic):
+		if enharmonic.lower() in ('sharp', 's', '#'):
+			enharmonic = 'sharp'
+		elif enharmonic.lower() in ('flat', 'f', 'b'):
+			enharmonic = 'flat'
+		else:
+			raise AttributeError("Unable to parse 'enharmonic' option.")
 		self._enharmonic = enharmonic
 		return
 
