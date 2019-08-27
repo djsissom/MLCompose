@@ -1,4 +1,4 @@
-__all__ = ['containers', 'convert']
+__all__ = ['containers', 'convert', 'interface']
 
 from . import containers
 from . import convert
@@ -12,5 +12,5 @@ Rest          = containers.Rest
 Event         = containers.Event
 Key           = containers.Key
 TimeSignature = containers.TimeSignature
-Control       = containers.Control
+Control       = interface.Control
 
