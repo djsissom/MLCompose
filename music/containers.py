@@ -102,7 +102,7 @@ class Track():
 
 	def end_track(self):
 		end_signal = Event('end_track')
-		self.measures[-1].add_event(end_signal)
+		self.measures[-1].beats[-1].add_event(end_signal)
 		return
 
 
