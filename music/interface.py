@@ -49,7 +49,7 @@ class Control():
 
 		# note mode needs note value, octave, and length
 		self.rest_node            = self.nodes[1,0:1]
-		self.note_nodes           = self.nodes[1,:]      # cyclical
+		self.note_nodes           = self.nodes[1,1:]     # cyclical
 		self.octave_nodes         = self.nodes[2,:]      # linear
 		self.duration_nodes       = self.nodes[3,0:6]    # linear
 		self.tie_nodes            = self.nodes[3,6:8]    # on/off
@@ -127,16 +127,17 @@ class Control():
 	def make_note(self, song=None, key='C_Maj'):
 		song = self.get_song(song)
 
-		note_index = self.note_nodes.argmax()
-		if note_index == 0:
+		if self.rest_node >= self.note_nodes.max():
 			self.set_rest()
+			return
 		else:
-			scale_degree = note_index
+			scale_degree = self.note_nodes.argmax() + 1
+			# TODO: set other note properties
 
-		note = Note(degree=scale_degree, octave=octave, \
+		note = Note(value=scale_degree, octave=octave, \
 		            duration=duration, intensity=intensity, \
-					tie=tie)
-		return note
+		            tie=tie)
+		return
 
 
 	def set_rest(self, song=None):
