@@ -120,6 +120,7 @@ class Control():
 
 	def end_song(self, song=None):
 		song = self.get_song(song)
+		song.end_song()
 		return
 
 
