@@ -126,8 +126,6 @@ class Control():
 
 	def make_note(self, song=None, key='C_Maj'):
 		song = self.get_song(song)
-		if song == None:
-			song = self.song
 
 		note_index = self.note_nodes.argmax()
 		if note_index == 0:
