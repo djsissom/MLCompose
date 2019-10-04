@@ -76,6 +76,21 @@ class Song():
 		return
 
 
+	def from_midi(self, midi_file):
+		from . import midi
+		tmp_song = midi.midi_to_song(midi_file)
+		self.time_signature = tmp_song.time_signature
+		self.key = tmp_song.key
+		self.tracks = tmp_song.tracks
+		return self
+
+
+	def to_midi(self, midi_file):
+		from . import midi
+		midi.song_to_midi(self, midi_file)
+		return
+
+
 
 class Track():
 	def __init__(self, desc=None):
