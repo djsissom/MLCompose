@@ -405,12 +405,13 @@ class Note(util.CheckArg):
 
 
 	def set_enharmonic(self, enharmonic):
-		if enharmonic.lower() in ('sharp', 's', '#'):
-			enharmonic = 'sharp'
-		elif enharmonic.lower() in ('flat', 'f', 'b'):
-			enharmonic = 'flat'
-		else:
-			raise AttributeError("Unable to parse 'enharmonic' option.")
+		if enharmonic is not None:
+			if enharmonic.lower() in ('sharp', 's', '#'):
+				enharmonic = 'sharp'
+			elif enharmonic.lower() in ('flat', 'f', 'b'):
+				enharmonic = 'flat'
+			else:
+				raise AttributeError("Unable to parse 'enharmonic' option.")
 		self._enharmonic = enharmonic
 		return
 
