@@ -2,6 +2,7 @@ __all__ = ['containers', 'convert', 'interface']
 
 from . import containers
 from . import convert
+from . import interface
 
 Song          = containers.Song
 Track         = containers.Track
