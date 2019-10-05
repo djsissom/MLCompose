@@ -373,7 +373,7 @@ class Note(util.CheckArg):
 
 	def set_intensity(self, intensity):
 		if (intensity < 0) or (intensity > 1):
-			raise AttributeError("Intensity should be within the interval [0,1] (inclusive)."
+			raise AttributeError("Intensity should be within the interval [0,1] (inclusive).")
 		self._intensity = intensity
 		return
 
