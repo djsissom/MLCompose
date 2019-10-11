@@ -30,9 +30,9 @@ def song_to_midi(song, midi_file='song.mid'):
 				offset = beat.offset
 
 				for note in beat.notes:
-					# TODO:  correct offset after first append
-					# TODO:  convert note spec to midi event
-					note_on = midi.NoteOnEvent(tick=0, velocity=20, pitch=midi.G_3)
+					midi_velocity = int(note.velocity * 127)
+					midi_pitch = note.value
+					note_on = midi.NoteOnEvent(tick=offset, velocity=midi_velocity, pitch=midi_pitch)
 					midi_track.append(note_on)
 					# TODO:  will have to create a note_off queue to keep track
 					# of when to turn each pitch off
@@ -40,11 +40,13 @@ def song_to_midi(song, midi_file='song.mid'):
 					# Instantiate a MIDI note off event, append it to the track
 					#off = midi.NoteOffEvent(tick=100, pitch=midi.G_3)
 					#midi_track.append(off)
+					offset = 0
 
 				for event in beat.events:
 					midi_event = midi.ControlChangeEvent()
 					# TODO:  look into event specification
 					midi_track.append(midi_event)
+					offset = 0
 
 		# End the track
 		eot = midi.EndOfTrackEvent(tick=1)
