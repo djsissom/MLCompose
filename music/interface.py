@@ -31,6 +31,66 @@ class Control():
 		# tensor of nodes from neural net output
 		self.nodes = np.zeros((6,8), dtype=np.float)
 
+		# node layout:
+		# -----------------
+		#  0 0 0 0 0 0 0 0  <-  mode control nodes
+		#  0 0 0 0 0 0 0 0  <-  rest/note nodes -or- keysig nodes
+		#  0 0 0 0 0 0 0 0  <-  octave nodes -or- timesig numerator nodes
+		#  0 0 0 0 0 0 0 0  <-  duration and tie nodes -or- timesig numerator nodes
+		#  0 0 0 0 0 0 0 0  <-  accidental, accent, and arpeggio nodes -or- tempo nodes
+		#  0 0 0 0 0 0 0 0  <-  velocity and played hand nodes -or- timesig denominator nodes -or- tempo nodes -or- dynamic nodes
+		# -----------------
+		#
+		# note mode node layout:
+		# -----------------
+		#  0 1 0 0 0 0 0 0  <-  mode control nodes
+		#  0 0 0 0 0 0 0 0  <-  rest/note nodes (rest + scale degree 1-7)
+		#  0 0 0 0 0 0 0 0  <-  octave nodes
+		#  0 0 0 0 0 0 0 0  <-  duration and tie nodes
+		#  0 0 0 0 0 0 0 0  <-  accidental, accent, and arpeggio nodes
+		#  0 0 0 0 0 0 0 0  <-  velocity and played hand nodes
+		# -----------------
+		#
+		# change keysig control mode node layout:
+		# -----------------
+		#  0 0 1 1 0 0 0 0  <-  mode control nodes
+		#  0 0 0 0 0 0 0 0  <-  keysig nodes
+		#  0 0 0 0 0 0 0 0  <-  (unused)
+		#  0 0 0 0 0 0 0 0  <-  (unused)
+		#  0 0 0 0 0 0 0 0  <-  keysig sharp/natural/flat nodes
+		#  0 0 0 0 0 0 0 0  <-  (unused)
+		# -----------------
+		#
+		# change timesig control mode node layout:
+		# -----------------
+		#  0 0 1 0 1 0 0 0  <-  mode control nodes
+		#  0 0 0 0 0 0 0 0  <-  (unused)
+		#  0 0 0 0 0 0 0 0  <-  timesig numerator nodes
+		#  0 0 0 0 0 0 0 0  <-  timesig numerator nodes
+		#  0 0 0 0 0 0 0 0  <-  (unused)
+		#  0 0 0 0 0 0 0 0  <-  timesig denominator nodes
+		# -----------------
+		#
+		# change tempo control mode node layout:
+		# -----------------
+		#  0 0 1 0 0 1 0 0  <-  mode control nodes
+		#  0 0 0 0 0 0 0 0  <-  (unused)
+		#  0 0 0 0 0 0 0 0  <-  (unused)
+		#  0 0 0 0 0 0 0 0  <-  (unused)
+		#  0 0 0 0 0 0 0 0  <-  tempo nodes
+		#  0 0 0 0 0 0 0 0  <-  tempo nodes
+		# -----------------
+		#
+		# change dynamic control mode node layout:
+		# -----------------
+		#  0 0 1 0 0 0 1 0  <-  mode control nodes
+		#  0 0 0 0 0 0 0 0  <-  (unused)
+		#  0 0 0 0 0 0 0 0  <-  (unused)
+		#  0 0 0 0 0 0 0 0  <-  (unused)
+		#  0 0 0 0 0 0 0 0  <-  (unused)
+		#  0 0 0 0 0 0 0 0  <-  dynamic nodes
+		# -----------------
+
 		# Array slices are used to make view instead of copy.  Descriptive
 		# names can then be used to reference node values without
 		# reinitialization steps.
