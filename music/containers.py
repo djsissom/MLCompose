@@ -5,6 +5,7 @@ import pandas as pd
 from itertools import cycle
 from ipdb import set_trace
 
+from . import convert
 from .. import util
 
 
@@ -54,7 +55,7 @@ class Song():
 
 	def set_key(self, keysig):
 		self._key = Key(keysig)
-		return key
+		return
 
 
 	def get_key(self):
@@ -77,8 +78,7 @@ class Song():
 
 
 	def from_midi(self, midi_file):
-		from . import midi
-		tmp_song = midi.midi_to_song(midi_file)
+		tmp_song = convert.midi_to_song(midi_file)
 		self.time_signature = tmp_song.time_signature
 		self.key = tmp_song.key
 		self.tracks = tmp_song.tracks
@@ -86,8 +86,7 @@ class Song():
 
 
 	def to_midi(self, midi_file):
-		from . import midi
-		midi.song_to_midi(self, midi_file)
+		convert.song_to_midi(self, midi_file)
 		return
 
 
