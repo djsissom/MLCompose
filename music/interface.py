@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import numpy as np
 import pandas as pd
 from ipdb import set_trace
@@ -79,7 +80,7 @@ class Control():
 
 
 	def get_song(self, song=None):
-		if song == None:
+		if song is None:
 			song = self._song
 		return song
 
@@ -102,20 +103,23 @@ class Control():
 
 	def update_altmethod(self, song=None):
 		song = self.get_song(song)
+		end_node = self.endsong_node
+		note_node = self.notemode_node
+		control_node = self.controlmode_node
 
-		if (endsong_node > notemode_node) and \
-		   (endsong_node > controlmode_node):
-			return self.end_song(song)
-		elif (notemode_node >= endsong_node) and \
-		     (notemode_node >= controlmode_node):
-			return self.make_note(song)
-		elif (controlmode_node >= endsong_node) and \
-		     (controlmode_node > notemode_node):
-			return self.set_control_signal(song)
+		if (end_node > self.notemode_node) and \
+		   (end_node > control_node):
+			mode_function = self.end_song
+		elif (note_node >= end_node) and \
+		     (note_node >= control_node):
+			mode_function = self.make_note
+		elif (control_node >= end_node) and \
+		     (control_node > note_node):
+			mode_function = self.set_control_signal
 		else:
 			print("Shouldn't get here...")
 			sys.exit(1923485)
-		return
+		return mode_function(song)
 
 
 	def end_song(self, song=None):
