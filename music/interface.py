@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from ipdb import set_trace
 
+from . import containers
 from .. import util
 
 
@@ -137,11 +138,18 @@ class Control():
 		else:
 			scale_degree = self.note_nodes.argmax() + 1
 			# TODO: set other note properties
+			octave = None
+			duration = None
+			intensity = None
+			tie = None
 
-		note = Note(value=scale_degree, octave=octave, \
-		            duration=duration, intensity=intensity, \
-		            tie=tie)
-		return
+		note = containers.Note(
+				value=scale_degree,
+				octave=octave,
+				duration=duration,
+				intensity=intensity,
+				tie=tie)
+		return note
 
 
 	def set_rest(self, song=None):
