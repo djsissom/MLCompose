@@ -152,34 +152,19 @@ class Control():
 	def update(self, song=None):
 		song = self.get_song(song)
 
-		max_mode_index = self.mode_nodes.argmax()
+		mode_list = np.array([
+			self.endsong_node,
+			self.notemode_node,
+			self.controlmode_node
+		])
+		max_mode_index = mode_list.argmax()
+
 		mode_functions = [
 			self.end_song,
 			self.make_note,
 			self.set_control_signal
 		]
 		mode_function = mode_functions[max_mode_index]
-		return mode_function(song)
-
-
-	def update_altmethod(self, song=None):
-		song = self.get_song(song)
-		end_node = self.endsong_node
-		note_node = self.notemode_node
-		control_node = self.controlmode_node
-
-		if (end_node > self.notemode_node) and \
-		   (end_node > control_node):
-			mode_function = self.end_song
-		elif (note_node >= end_node) and \
-		     (note_node >= control_node):
-			mode_function = self.make_note
-		elif (control_node >= end_node) and \
-		     (control_node > note_node):
-			mode_function = self.set_control_signal
-		else:
-			print("Shouldn't get here...")
-			sys.exit(1923485)
 		return mode_function(song)
 
 
