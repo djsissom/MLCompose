@@ -32,7 +32,7 @@ def read_configs():
 	settings = config.Settings(config_file)
 
 	if opts != None:
-		opts.override_settings(settings.mode)
+		opts.override_settings(settings)
 		if opts.mlcompose_files is not None:
 			settings.files.mlcompose_files = opts.mlcompose_files
 
