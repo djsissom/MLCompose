@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import sys
-import config
+
+from .. import config
 
 
 
