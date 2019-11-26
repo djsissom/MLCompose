@@ -4,9 +4,9 @@ import sys
 from ipdb import set_trace
 from ipdb import launch_ipdb_on_exception
 
-import config
-import music
-import learn
+from . import config
+from . import music
+from . import learn
 
 
 
