@@ -180,13 +180,13 @@ class Control():
 		if self.rest_node >= self.note_nodes.max():
 			self.set_rest()
 			return
-		else:
-			scale_degree = self.note_nodes.argmax() + 1
-			# TODO: set other note properties
-			octave = None
-			duration = None
-			intensity = None
-			tie = None
+
+		scale_degree = self.note_nodes.argmax() + 1
+		# TODO: set other note properties
+		octave = None
+		duration = None
+		intensity = None
+		tie = None
 
 		note = containers.Note(
 				value=scale_degree,
@@ -194,7 +194,7 @@ class Control():
 				duration=duration,
 				intensity=intensity,
 				tie=tie)
-		return note
+		return
 
 
 	def set_rest(self, song=None):
