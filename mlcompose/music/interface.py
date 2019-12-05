@@ -174,26 +174,36 @@ class Control():
 		return
 
 
-	def make_note(self, song=None, key='C_Maj'):
+	def make_note(self, song=None, key=None):
 		song = self.get_song(song)
 
 		if self.rest_node >= self.note_nodes.max():
 			self.set_rest()
 			return
 
-		scale_degree = self.note_nodes.argmax() + 1
-		# TODO: set other note properties
-		octave = None
-		duration = None
-		intensity = None
-		tie = None
+		if key is None:
+			key = song.key
+
+		scale_degree = self.note_nodes.argmax() # note this is zero-based here
+		note_name = key.notes[scale_degree]
+		note_octave = self.octave_nodes.argmax()
+		note_duration = self.duration_nodes.argmax()
+		note_intensity = self.velocity_nodes.argmax()
+		note_tie = None
 
 		note = containers.Note(
-				value=scale_degree,
-				octave=octave,
-				duration=duration,
-				intensity=intensity,
-				tie=tie)
+				name=note_name,
+				octave=note_octave,
+				duration=note_duration,
+				intensity=note_intensity,
+				tie=note_tie)
+
+		max_accidental_node = self.accidental_nodes.argmax()
+		if max_accidental_node == 0:
+			note.lower_note()
+		elif max_accidental_node == 2:
+			note.raise_note()
+
 		return
 
 
