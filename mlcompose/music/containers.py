@@ -481,6 +481,23 @@ class Event():
 
 
 
+class Duration(util.CheckArg):
+	def __init__(self, duration=None, mode='inverse'):
+		if duration is not None:
+			self.set(duration, mode)
+
+
+	def set(self, duration, mode='inverse'):
+		if mode == 'inverse':
+			pass
+		elif mode == 'power':
+			pass
+		else:
+			raise AttributeError("Duration class mode options are 'inverse' and 'power'.")
+		return self
+
+
+
 class Key(util.CheckArg):
 	'''
 	Key(key=None, naccidentals=None, sharpflat=None, majmin=None)
