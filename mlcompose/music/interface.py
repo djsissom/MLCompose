@@ -114,7 +114,7 @@ class Control():
 		self.note_nodes           = self.nodes[1,1:]     # cyclical
 		self.octave_nodes         = self.nodes[2,:]      # linear
 		self.duration_nodes       = self.nodes[3,0:6]    # linear
-		self.tie_nodes            = self.nodes[3,6:8]    # on/off
+		self.tie_nodes            = self.nodes[3,6:8]    # off/on
 
 		# last two rows used for other per note settings
 		self.note_settings_nodes  = self.nodes[4:6,:]
@@ -187,9 +187,9 @@ class Control():
 		scale_degree = self.note_nodes.argmax() # note this is zero-based here
 		note_name = key.notes[scale_degree]
 		note_octave = self.octave_nodes.argmax()
-		note_duration = self.duration_nodes.argmax()
-		note_intensity = self.velocity_nodes.argmax()
-		note_tie = None
+		note_duration = self.duration_nodes.argmax() # TODO: decide on duration format standard
+		note_intensity = float(self.velocity_nodes.argmax() + 1) / float(len(self.velocity_nodes))
+		note_tie = bool(self.tie_nodes.argmax())
 
 		note = containers.Note(
 				name=note_name,
