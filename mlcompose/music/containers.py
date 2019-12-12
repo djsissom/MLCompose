@@ -482,19 +482,42 @@ class Event():
 
 
 class Duration(util.CheckArg):
-	def __init__(self, duration=None, mode='inverse'):
-		if duration is not None:
-			self.set(duration, mode)
+	def __init__(self, base=None, count=1, mode='inverse', dot=False):
+		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth']
+		self.bases = self.names
+		if base is not None:
+			self.set(base, count, mode, dot)
 
 
-	def set(self, duration, mode='inverse'):
-		if mode == 'inverse':
-			pass
-		elif mode == 'power':
-			pass
+	def set(self, base, count=1, mode='inverse', dot=False):
+		if base in self.names:
+			list_position = self.names.index(base)
+			self.base = 2**list_position
+		elif mode == 'inverse':
+			self.base = base
+		elif mode == 'inverse_power':
+			self.base = 2**base
 		else:
-			raise AttributeError("Duration class mode options are 'inverse' and 'power'.")
+			raise AttributeError("Duration class mode options are 'inverse' and 'inverse_power'.")
 		return self
+
+
+	def set_base(self, base):
+		self._base = base
+		return
+
+
+	def get_base(self):
+		return self._base
+
+
+	base = property(get_base, set_base)
+
+
+	def __str__(self):
+		import math
+		repstring = self.names[int(math.log2(self.base))]
+		return repstring
 
 
 

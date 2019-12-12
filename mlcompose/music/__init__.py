@@ -11,6 +11,7 @@ Beat          = containers.Beat
 Note          = containers.Note
 Rest          = containers.Rest
 Event         = containers.Event
+Duration      = containers.Duration
 Key           = containers.Key
 TimeSignature = containers.TimeSignature
 Control       = interface.Control
