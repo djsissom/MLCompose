@@ -482,14 +482,14 @@ class Event():
 
 
 class Duration(util.CheckArg):
-	def __init__(self, base=None, count=1, mode='inverse', dot=False):
+	def __init__(self, base=None, mode='inverse', dot=False):
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth']
 		self.bases = self.names
 		if base is not None:
-			self.set(base, count, mode, dot)
+			self.set(base, mode, dot)
 
 
-	def set(self, base, count=1, mode='inverse', dot=False):
+	def set(self, base, mode='inverse', dot=False):
 		if base in self.names:
 			list_position = self.names.index(base)
 			self.base = 2**list_position
@@ -499,6 +499,7 @@ class Duration(util.CheckArg):
 			self.base = 2**base
 		else:
 			raise AttributeError("Duration class mode options are 'inverse' and 'inverse_power'.")
+		self.dot = dot
 		return self
 
 
@@ -514,9 +515,27 @@ class Duration(util.CheckArg):
 	base = property(get_base, set_base)
 
 
+	def set_dot(self, dot):
+		if type(dot) is not bool:
+			raise AttributeError("Duration class dot attribute must be True or False.")
+		self._dot = dot
+		return
+
+
+	def get_dot(self):
+		return self._dot
+
+
+	dot = property(get_dot, set_dot)
+
+
 	def __str__(self):
 		import math
-		repstring = self.names[int(math.log2(self.base))]
+		basename = self.names[int(math.log2(self.base))]
+		if self.dot:
+			repstring = 'dotted ' + basename
+		else:
+			repstring = basename
 		return repstring
 
 
