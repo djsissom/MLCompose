@@ -484,15 +484,20 @@ class Event():
 class Duration(util.CheckArg):
 	def __init__(self, base=None, mode='inverse', dot=False):
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth']
-		self.bases = self.names
+		self.bases = [1, 2, 4, 8, 16, 32, 64]
+		self.base = None
+		self.dot = None
 		if base is not None:
 			self.set(base, mode, dot)
 
 
 	def set(self, base, mode='inverse', dot=False):
-		if base in self.names:
-			list_position = self.names.index(base)
-			self.base = 2**list_position
+		if (type(base) == str) and (base[:6].lower() == 'dotted'):
+			dot = True
+			base = base[7:]
+		if base.lower() in self.names:
+			list_index = self.names.index(base.lower())
+			self.base = 2**list_index
 		elif mode == 'inverse':
 			self.base = base
 		elif mode == 'inverse_power':
@@ -504,6 +509,8 @@ class Duration(util.CheckArg):
 
 
 	def set_base(self, base):
+		if (base not in self.bases) and (base is not None):
+			raise AttributeError("Duration base must be a power of 2 between 1 and 64.")
 		self._base = base
 		return
 
@@ -516,7 +523,7 @@ class Duration(util.CheckArg):
 
 
 	def set_dot(self, dot):
-		if type(dot) is not bool:
+		if (type(dot) is not bool) and (dot is not None):
 			raise AttributeError("Duration class dot attribute must be True or False.")
 		self._dot = dot
 		return
@@ -530,8 +537,8 @@ class Duration(util.CheckArg):
 
 
 	def __str__(self):
-		import math
-		basename = self.names[int(math.log2(self.base))]
+		list_index = self.bases.index(self.base)
+		basename = self.names[list_index]
 		if self.dot:
 			repstring = 'dotted ' + basename
 		else:
