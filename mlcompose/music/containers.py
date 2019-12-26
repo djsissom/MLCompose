@@ -482,6 +482,31 @@ class Event():
 
 
 class Duration(util.CheckArg):
+	'''
+	Duration(base=None, mode='inverse', dot=False)
+
+	Create a Duration object.  If no parameters are given, creates an
+	uninitialized instance.  Can be (re-)initialized with the set() method with
+	the same parameters.
+
+	Parameters
+	----------
+	base : str, int power of 2 <= 64, int <= 6, or Duration instance (optional)
+		The note or rest duration base.  If a string is passed, allowed names
+		are English note names between 'whole' and 'sixty-fourth', optionally
+		prepended with 'dotted ' to override and enable the dot option, for
+		example: 'dotted thirty-second'.  If an integer is passed, allowed
+		values are powers of 2 between 1 and 64 if mode is 'inverse' or
+		integers between 0 and 6 if mode is 'inverse_power'.  If an existing
+		Duration object is given, setup is skipped and that object is returned.
+	mode : {'inverse', 'inverse_power'} (optional)
+		Select between specifying the base as a power of two directly
+		('inverse') or the exponent with which to raise 2 ('inverse_power').
+		This option is ignored if base is a string.
+	dot : bool (optional)
+		Specify whether the duration should be dotted.  If True, the base duration
+		is multiplied by 1.5 (e.g., a dotted quarter is three eighths).
+	'''
 	def __init__(self, base=None, mode='inverse', dot=False):
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth']
 		self.bases = [1, 2, 4, 8, 16, 32, 64]
