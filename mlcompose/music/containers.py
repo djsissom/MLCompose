@@ -359,8 +359,7 @@ class Note(util.CheckArg):
 
 
 	def set_duration(self, duration):
-		if not isinstance(duration, Duration):
-			duration = Duration(duration)
+		duration = Duration(duration)
 		self._duration = duration
 		return
 
@@ -476,8 +475,7 @@ class Rest():
 
 
 	def set_duration(self, duration):
-		if not isinstance(duration, Duration):
-			duration = Duration(duration)
+		duration = Duration(duration)
 		self._duration = duration
 		return
 
