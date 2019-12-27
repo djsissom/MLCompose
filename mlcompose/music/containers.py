@@ -161,13 +161,14 @@ class Measure():
 
 
 class Beat():
-	def __init__(self, offset=1):
+	def __init__(self, offset='quarter'):
 		self.offset = offset
 		self.notes = []
 		self.events = []
 
 
 	def set_offset(self, offset):
+		offset = Duration(offset)
 		self._offset = offset
 		return
 
@@ -192,7 +193,7 @@ class Beat():
 
 
 class Note(util.CheckArg):
-	def __init__(self, note=None, octave=5, duration=1, intensity=1.0, tie=False, enharmonic=None, name=None, value=None):
+	def __init__(self, note=None, octave=5, duration='quarter', intensity=1.0, tie=False, enharmonic=None, name=None, value=None):
 		self.sharpnames = ('C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B')
 		self.flatnames  = ('C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B')
 		self._value = None
@@ -206,7 +207,7 @@ class Note(util.CheckArg):
 			self.set(note, octave, duration, intensity, tie, enharmonic, name, value)
 
 
-	def set(self, note=None, octave=5, duration=1, intensity=1.0, tie=False, enharmonic=None, name=None, value=None):
+	def set(self, note=None, octave=5, duration='quarter', intensity=1.0, tie=False, enharmonic=None, name=None, value=None):
 		self.duration   = duration
 		self.intensity  = intensity
 		self.tie        = tie
