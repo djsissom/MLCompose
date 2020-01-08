@@ -187,7 +187,8 @@ class Control():
 		scale_degree = self.note_nodes.argmax() # note this is zero-based here
 		note_name = key.notes[scale_degree]
 		note_octave = self.octave_nodes.argmax()
-		note_duration = self.duration_nodes.argmax() # TODO: decide on duration format standard
+		note_duration_power = self.duration_nodes.argmax()
+		note_duration = containers.Duration(note_duration_power, mode='inverse_power')
 		note_intensity = float(self.velocity_nodes.argmax() + 1) / float(len(self.velocity_nodes))
 		note_tie = bool(self.tie_nodes.argmax())
 
