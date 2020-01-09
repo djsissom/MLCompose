@@ -38,6 +38,7 @@ class Song():
 		self.key = key
 		self.time_signature = time_signature
 		self.tracks = []
+		self.ended = False
 
 
 	def set_timesig(self, timesig):
@@ -66,7 +67,9 @@ class Song():
 	key = property(get_key, set_key)
 
 
-	def add_track(self, track):
+	def add_track(self, track=None):
+		if track is None:
+			track = Track()
 		self.tracks.append(track)
 		return self.tracks
 
@@ -74,7 +77,8 @@ class Song():
 	def end_song(self):
 		for track in self.tracks:
 			track.end_track()
-		return
+		self.ended = True
+		return self
 
 
 	def from_midi(self, midi_file):
@@ -109,15 +113,20 @@ class Track():
 	description = property(get_description, set_description)
 
 
-	def append_measure(self, measure):
+	def append_measure(self, measure=None):
+		if measure is None:
+			measure = Measure()
 		self.measures.append(measure)
-		return self.measures
+		return measure
 
 
 	def end_track(self):
 		end_signal = Event('end_track')
 		self.measures[-1].beats[-1].add_event(end_signal)
-		return
+		final_measure = self.append_measure()
+		final_beat = final_measure.append_beat()
+		final_beat.add_event(end_signal)
+		return self
 
 
 
@@ -154,9 +163,14 @@ class Measure():
 	time_signature = property(get_timesig, set_timesig)
 
 
-	def append_beat(self, beat):
+	def append_beat(self, beat=None):
+		if beat is None:
+			if self.beats == []:
+				beat = Beat(offset=0)
+			else:
+				beat = Beat()
 		self.beats.append(beat)
-		return self.beats
+		return beat
 
 
 
@@ -181,14 +195,14 @@ class Beat():
 	offset = property(get_offset, set_offset)
 
 
-	def append_note(self, note):
+	def add_note(self, note):
 		self.notes.append(note)
-		return self.notes
+		return note
 
 
 	def add_event(self, event):
 		self.events.append(event)
-		return self.events
+		return event
 
 
 
@@ -549,6 +563,7 @@ class Duration(util.CheckArg):
 
 
 	def set_base(self, base):
+		# TODO:  allow zero-length durations (for offsets)
 		if (base not in self.bases) and (base is not None):
 			raise AttributeError("Duration base must be a power of 2 between 1 and 64.")
 		self._base = base

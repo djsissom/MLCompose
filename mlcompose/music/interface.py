@@ -210,11 +210,13 @@ class Composer():
 
 	def set_rest(self, song=None):
 		song = self.get_song(song)
+		# TODO:  actually do something here
 		return
 
 
 	def set_control_signal(self, song=None):
 		song = self.get_song(song)
+		# TODO:  actually do something here
 		return
 
 
