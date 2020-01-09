@@ -17,13 +17,13 @@ def main():
 	ML node output music control interface.
 	'''
 
-	test_control = Control()
+	test_composer = Composer()
 
 	return
 
 
 
-class Control():
+class Composer():
 	def __init__(self, song=None):
 		# set default song to work on
 		self.song = song

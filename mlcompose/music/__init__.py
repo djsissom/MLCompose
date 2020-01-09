@@ -14,5 +14,5 @@ Event         = containers.Event
 Duration      = containers.Duration
 Key           = containers.Key
 TimeSignature = containers.TimeSignature
-Control       = interface.Control
+Composer      = interface.Composer
 
