@@ -177,6 +177,7 @@ class Composer():
 	def make_note(self, song=None, key=None):
 		song = self.get_song(song)
 
+		# TODO:  This should depend on whether it's a real rest or ending a chord.
 		if self.rest_node >= self.note_nodes.max():
 			self.set_rest()
 			return

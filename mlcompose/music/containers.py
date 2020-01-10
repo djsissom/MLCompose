@@ -526,8 +526,10 @@ class Duration(util.CheckArg):
 		prepended with 'dotted ' to override and enable the dot option, for
 		example: 'dotted thirty-second'.  If an integer is passed, allowed
 		values are powers of 2 between 1 and 64 if mode is 'inverse' or
-		integers between 0 and 6 if mode is 'inverse_power'.  If an existing
-		Duration object is given, setup is skipped and that object is returned.
+		integers between 0 and 6 if mode is 'inverse_power'.  The special case
+		of a zero-length duration is created by setting base to 'zero' or 0
+		with mode set to the default 'inverse'.  If an existing Duration object
+		is given, setup is skipped and that object is returned.
 	mode : {'inverse', 'inverse_power'} (optional)
 		Select between specifying the base as a power of two directly
 		('inverse') or the exponent with which to raise 2 ('inverse_power').
@@ -537,8 +539,8 @@ class Duration(util.CheckArg):
 		is multiplied by 1.5 (e.g., a dotted quarter is three eighths).
 	'''
 	def __init__(self, base=None, mode='inverse', dot=False):
-		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth']
-		self.bases = [1, 2, 4, 8, 16, 32, 64]
+		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
+		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
 		self.base = None
 		self.dot = None
 		if base is not None:
@@ -549,9 +551,10 @@ class Duration(util.CheckArg):
 		if (type(base) == str) and (base[:6].lower() == 'dotted'):
 			dot = True
 			base = base[7:]
+		# TODO:  Some of this logic could probably move to set_base()
 		if base.lower() in self.names:
 			list_index = self.names.index(base.lower())
-			self.base = 2**list_index
+			self.base = self.bases[list_index]
 		elif mode == 'inverse':
 			self.base = base
 		elif mode == 'inverse_power':
@@ -563,7 +566,6 @@ class Duration(util.CheckArg):
 
 
 	def set_base(self, base):
-		# TODO:  allow zero-length durations (for offsets)
 		if (base not in self.bases) and (base is not None):
 			raise AttributeError("Duration base must be a power of 2 between 1 and 64.")
 		self._base = base
