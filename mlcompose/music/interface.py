@@ -198,7 +198,8 @@ class Composer():
 				octave=note_octave,
 				duration=note_duration,
 				intensity=note_intensity,
-				tie=note_tie)
+				tie=note_tie
+			)
 
 		max_accidental_node = self.accidental_nodes.argmax()
 		if max_accidental_node == 0:
