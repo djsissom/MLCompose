@@ -85,9 +85,11 @@ def track_to_midi(song_track, pattern=None):
 
 
 def midi_length(duration):
-	# TODO:  convert durations to midi ticks
-	length = duration.blah
-	return length
+	tpq = 32
+	length = tpq * 4. / duration.base
+	if duration.dot:
+		length = length * 1.5
+	return int(length)
 
 
 
