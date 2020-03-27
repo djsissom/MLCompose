@@ -70,7 +70,7 @@ def track_to_midi(song_track, pattern=None):
 					ticks_to_off_event = 999999999
 
 			for note in beat.notes:
-				midi_velocity = int(note.velocity * 127)
+				midi_velocity = int(note.intensity * 127)
 				midi_pitch = note.value
 				note_on_event = midi.NoteOnEvent(tick=ticks_to_beat, velocity=midi_velocity, pitch=midi_pitch)
 				midi_track.append(note_on_event)
