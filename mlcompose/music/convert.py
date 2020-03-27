@@ -48,7 +48,10 @@ def track_to_midi(song_track, pattern=None):
 			ticks_to_beat = midi_length(beat.offset)
 
 			mask = (deactivation_queue >= 0)
-			ticks_to_off_event = deactivation_queue[mask].min()
+			if mask.any():
+				ticks_to_off_event = deactivation_queue[mask].min()
+			else:
+				ticks_to_off_event = 999999999
 
 			# add note off events until time for the next beat
 			while ticks_to_off_event <= ticks_to_beat:
@@ -61,7 +64,10 @@ def track_to_midi(song_track, pattern=None):
 					midi_track.append(off_event)
 					ticks_to_off_event = 0
 				mask = (deactivation_queue >= 0)
-				ticks_to_off_event = deactivation_queue[mask].min()
+				if mask.any():
+					ticks_to_off_event = deactivation_queue[mask].min()
+				else:
+					ticks_to_off_event = 999999999
 
 			for note in beat.notes:
 				midi_velocity = int(note.velocity * 127)
