@@ -552,7 +552,7 @@ class Duration(util.CheckArg):
 			dot = True
 			base = base[7:]
 		# TODO:  Some of this logic could probably move to set_base()
-		if base.lower() in self.names:
+		if (type(base) == str) and (base.lower() in self.names):
 			list_index = self.names.index(base.lower())
 			self.base = self.bases[list_index]
 		elif mode == 'inverse':
