@@ -90,8 +90,8 @@ class Song():
 
 
 	def to_midi(self, midi_file):
-		convert.song_to_midi(self, midi_file)
-		return
+		pattern = convert.song_to_midi(self, midi_file)
+		return pattern
 
 
 
