@@ -86,9 +86,12 @@ def track_to_midi(song_track, pattern=None):
 
 def midi_length(duration):
 	tpq = 32
-	length = tpq * 4. / duration.base
-	if duration.dot:
-		length = length * 1.5
+	if duration == 0 or duration.base == 0:
+		length = 0
+	else:
+		length = tpq * 4. / duration.base
+		if duration.dot:
+			length = length * 1.5
 	return int(length)
 
 
