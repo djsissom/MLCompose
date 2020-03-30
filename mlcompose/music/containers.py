@@ -71,7 +71,7 @@ class Song():
 		if track is None:
 			track = Track()
 		self.tracks.append(track)
-		return self.tracks
+		return track
 
 
 	def end_song(self):
