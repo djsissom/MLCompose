@@ -2,7 +2,7 @@
 
 import unittest
 
-from .. import containers
+from mlcompose.util import containers
 
 
 
