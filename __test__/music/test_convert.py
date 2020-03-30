@@ -2,8 +2,8 @@
 
 import unittest
 
-from .. import containers
-from .. import convert
+from mlcompose.music import containers
+from mlcompose.music import convert
 
 
 
