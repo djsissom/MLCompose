@@ -504,8 +504,8 @@ class Rest():
 
 
 class Event():
-	def __init__(self, event_type=None, descr=None):
-		self.event_type = event_type
+	def __init__(self, name=None, descr=None):
+		self.name = name
 		self.description = descr
 
 
