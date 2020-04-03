@@ -78,20 +78,23 @@ def track_to_midi(song_track, pattern=None):
 				ticks_to_beat = 0
 
 			for event in beat.events:
-				midi_event = midi.ControlChangeEvent(tick=ticks_to_beat)
+				if event.name == 'end_track':
+					midi_event = midi.EndOfTrackEvent(tick=1)
+				else:
+					midi_event = midi.ControlChangeEvent(tick=ticks_to_beat)
 				# TODO:  look into event specification
 				midi_track.append(midi_event)
 				ticks_to_beat = 0
 
 	# End the track
-	eot = midi.EndOfTrackEvent(tick=1)
-	midi_track.append(eot)
+	if not isinstance(midi_track[-1], midi.EndOfTrackEvent):
+		eot = midi.EndOfTrackEvent(tick=1)
+		midi_track.append(eot)
 	return pattern
 
 
 
-def midi_length(duration):
-	tpq = 32
+def midi_length(duration, tpq=32):
 	if duration == 0 or duration.base == 0:
 		length = 0
 	else:
