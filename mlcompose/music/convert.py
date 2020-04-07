@@ -114,6 +114,72 @@ def midi_to_song(midi_file):
 
 
 def midi_to_track(midi_track):
+	track = music.Track()
+	case = {
+		'midi.TrackNameEvent':      handle_track_name_event,
+		'midi.ControlChangeEvent':  handle_control_change_event,
+		'midi.ProgramChangeEvent':  handle_program_change_event,
+		'midi.TimeSignatureEvent':  handle_time_signature_event,
+		'midi.KeySignatureEvent':   handle_key_signature_event,
+		'midi.SetTempoEvent':       handle_set_tempo_event,
+		'midi.NoteOnEvent':         handle_note_on_event,
+		'midi.NoteOffEvent':        handle_note_off_event,
+		'midi.EndOfTrackEvent':     handle_end_of_track_event
+	}
+	for event in midi_track:
+		event_type_string = str(event).split('(')[0]
+		parse_function = case.get(event_type_string, handle_unknown_event)
+		track = parse_function(event, track)
+	return track
+
+
+def handle_unknown_event(event, track):
+	print('Skipping unknown midi event  -> ', event)
+	return track
+
+
+def handle_track_name_event(event, track):
+	# TODO:  add functionality to handler function
+	return track
+
+
+def handle_control_change_event(event, track):
+	# TODO:  add functionality to handler function
+	return track
+
+
+def handle_program_change_event(event, track):
+	# TODO:  add functionality to handler function
+	return track
+
+
+def handle_time_signature_event(event, track):
+	# TODO:  add functionality to handler function
+	return track
+
+
+def handle_key_signature_event(event, track):
+	# TODO:  add functionality to handler function
+	return track
+
+
+def handle_set_tempo_event(event, track):
+	# TODO:  add functionality to handler function
+	return track
+
+
+def handle_note_on_event(event, track):
+	# TODO:  add functionality to handler function
+	return track
+
+
+def handle_note_off_event(event, track):
+	# TODO:  add functionality to handler function
+	return track
+
+
+def handle_end_of_track_event(event, track):
+	# TODO:  add functionality to handler function
 	return track
 
 
