@@ -5,6 +5,7 @@ import numpy as np
 from ipdb import set_trace
 
 from .. import util
+from .. import music
 
 
 
@@ -106,7 +107,16 @@ def midi_length(duration, tpq=32):
 
 
 def midi_to_song(midi_file):
+	pattern = midi.read_midifile(midi_file)
+	song = music.Song()
+	for midi_track in pattern:
+		track = midi_to_track(midi_track)
+		song.add_track(track)
 	return song
+
+
+def midi_to_track(midi_track):
+	return track
 
 
 
