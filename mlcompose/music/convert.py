@@ -24,8 +24,9 @@ def main():
 
 def song_to_midi(song, midi_file='song.mid'):
 	pattern = midi.Pattern()
-	for song_track in song.tracks:
-		pattern = track_to_midi(song_track, pattern=pattern)
+	for track in song.tracks:
+		midi_track = track_to_midi(track)
+		pattern.append(midi_track)
 
 	# Save the pattern to disk
 	midi.write_midifile(midi_file, pattern)
@@ -33,18 +34,15 @@ def song_to_midi(song, midi_file='song.mid'):
 
 
 
-def track_to_midi(song_track, pattern=None):
-	if pattern is None:
-		pattern = midi.Pattern()
+def track_to_midi(track):
 	midi_track = midi.Track()
-	pattern.append(midi_track)
 
 	# deactivation_queue is an array with a value for each midi note pitch
 	# negative numbers indicate the pitch is not active
 	# positive numbers are the remaining ticks until cutoff
 	deactivation_queue = np.zeros(128, dtype=np.int) - 1
 
-	for measure in song_track.measures:
+	for measure in track.measures:
 		for beat in measure.beats:
 			ticks_to_beat = midi_length(beat.offset)
 
@@ -91,7 +89,7 @@ def track_to_midi(song_track, pattern=None):
 	if not isinstance(midi_track[-1], midi.EndOfTrackEvent):
 		eot = midi.EndOfTrackEvent(tick=1)
 		midi_track.append(eot)
-	return pattern
+	return midi_track
 
 
 
