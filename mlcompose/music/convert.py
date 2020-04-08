@@ -139,7 +139,10 @@ def handle_unknown_event(event, track):
 
 
 def handle_track_name_event(event, track):
-	# TODO:  add functionality to handler function
+	try:
+		track.description = event.text
+	except AttributeError:
+		print("Warning:  Track name event has no text attribute...skipping.")
 	return track
 
 
