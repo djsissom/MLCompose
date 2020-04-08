@@ -148,41 +148,49 @@ def handle_track_name_event(event, track):
 
 def handle_control_change_event(event, track):
 	# TODO:  add functionality to handler function
+	print('Skipping control change event  -> ', event)
 	return track
 
 
 def handle_program_change_event(event, track):
 	# TODO:  add functionality to handler function
+	print('Skipping program change event  -> ', event)
 	return track
 
 
 def handle_time_signature_event(event, track):
 	# TODO:  add functionality to handler function
+	print('Skipping time signature event  -> ', event)
 	return track
 
 
 def handle_key_signature_event(event, track):
 	# TODO:  add functionality to handler function
+	print('Skipping key signature event  -> ', event)
 	return track
 
 
 def handle_set_tempo_event(event, track):
 	# TODO:  add functionality to handler function
+	print('Skipping set tempo event  -> ', event)
 	return track
 
 
 def handle_note_on_event(event, track):
 	# TODO:  add functionality to handler function
+	print('Skipping note on event  -> ', event)
 	return track
 
 
 def handle_note_off_event(event, track):
 	# TODO:  add functionality to handler function
+	print('Skipping note off event  -> ', event)
 	return track
 
 
 def handle_end_of_track_event(event, track):
 	# TODO:  add functionality to handler function
+	print('Skipping end of track event  -> ', event)
 	return track
 
 
