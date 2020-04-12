@@ -178,6 +178,7 @@ class Beat():
 		self.offset = offset
 		self.notes = []
 		self.events = []
+		self.complete = False
 
 
 	def set_offset(self, offset):
@@ -192,6 +193,21 @@ class Beat():
 
 
 	offset = property(get_offset, set_offset)
+
+
+	def set_complete(self, complete):
+		complete = bool(complete)
+		self._complete = complete
+		return
+
+
+	def get_complete(self):
+		complete = self._complete
+		return complete
+
+
+	complete = property(get_complete, set_complete)
+	ended = property(get_complete, set_complete)
 
 
 	def add_note(self, note):

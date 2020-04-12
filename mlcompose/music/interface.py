@@ -150,6 +150,13 @@ class Composer():
 
 
 	def update(self, song=None):
+		'''
+		Update the song using the currently set control nodes.
+
+		This driver method should be called after updating the nodes attribute
+		of the Composer.  The update method reads the currently activated
+		control nodes and adds to/modifies the song accordingly.
+		'''
 		song = self.get_song(song)
 
 		mode_list = np.array([
