@@ -158,6 +158,7 @@ class Composer():
 		control nodes and adds to/modifies the song accordingly.
 		'''
 		song = self.get_song(song)
+		current_measures, current_beats = update_position(song)
 
 		mode_list = np.array([
 			self.endsong_node,
@@ -173,6 +174,32 @@ class Composer():
 		]
 		mode_function = mode_functions[max_mode_index]
 		return mode_function(song)
+
+
+	def update_position(self, song=None):
+		'''Find the latest unfinished measures and beats.'''
+		song = self.get_song(song)
+		current_measures = []
+		current_beats = []
+
+		for track in song.tracks:
+			last_measure = track.measures[-1]
+			if check_measure_complete(last_measure):
+				last_measure = track.append_measure()
+			current_measures.append(last_measure)
+
+			last_beat = last_measure.beats[-1]
+			if last_beat.complete:
+				last_beat = last_measure.append_beat()
+			current_beats.append(last_beat)
+
+		return current_measures, current_beats
+
+
+	def check_measure_complete(self, measure):
+		# TODO:  test for complete measure
+		# Potentially add this to measure class instead...
+		return True
 
 
 	def end_song(self, song=None):

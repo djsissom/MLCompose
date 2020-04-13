@@ -134,6 +134,7 @@ class Measure():
 		self.key = key
 		self.time_signature = time_signature
 		self.beats = []
+		# TODO:  Measure should default to having a first beat
 
 
 	def set_key(self, keysig):
@@ -163,6 +164,8 @@ class Measure():
 
 
 	def append_beat(self, beat=None):
+		# TODO:  Fix append beat offsets
+		# This should probably be where offset based on the previous beat is determined
 		if beat is None:
 			if self.beats == []:
 				beat = Beat(offset=0)
