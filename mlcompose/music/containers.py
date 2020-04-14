@@ -133,8 +133,10 @@ class Measure():
 	def __init__(self, key=None, time_signature=None):
 		self.key = key
 		self.time_signature = time_signature
+		self.complete = False
 		self.beats = []
 		# TODO:  Measure should default to having a first beat
+		# TODO:  Measure should initialize with default key and time sig
 
 
 	def set_key(self, keysig):
@@ -163,6 +165,31 @@ class Measure():
 	time_signature = property(get_timesig, set_timesig)
 
 
+	def set_complete(self, complete):
+		self._complete = bool(complete)
+		return
+
+
+	def get_complete(self):
+		complete = self._complete
+		last_beat = self.beats[-1]
+		if not complete and last_beat.complete:
+			shortest_note = last_beat.min_note_length
+			ts = self.time_signature
+			total_duration = ts.numerator * Duration(ts.denominator)
+			passed_duration = Duration(0)
+			for note in last_beat.notes:
+				passed_duration = passed_duration + note.offset
+			remaining_duration = total_duration - passed_duration
+			if shortest_note.duration == remaining_duration:
+				complete = True
+				self.complete = complete
+		return complete
+
+
+	complete = property(get_complete, set_complete)
+
+
 	def append_beat(self, beat=None):
 		# TODO:  Fix append beat offsets
 		# This should probably be where offset based on the previous beat is determined
@@ -182,6 +209,9 @@ class Beat():
 		self.notes = []
 		self.events = []
 		self.complete = False
+		# TODO:  Add methods for shortest and longest note durations in beat
+		# min_note_length
+		# max_note_length
 
 
 	def set_offset(self, offset):
@@ -563,6 +593,8 @@ class Duration(util.CheckArg):
 		self.dot = None
 		if base is not None:
 			self.set(base, mode, dot)
+		# TODO:  Add overloading methods for duration comparison
+		# TODO:  Add overloading methods for duration operators (add, etc.)
 
 
 	def set(self, base, mode='inverse', dot=False):
