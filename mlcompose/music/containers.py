@@ -643,6 +643,41 @@ class Duration(util.CheckArg):
 	dot = property(get_dot, set_dot)
 
 
+	def set_length(self, length):
+		print('Warning:  Duration lengths are set via the base and dot attributes...skipping.')
+		return
+
+
+	def get_length(self):
+		length = 1. / self.base
+		if self.dot:
+			length = length * 1.5
+		return length
+
+
+	length = property(get_length, set_length)
+
+
+	def __eq__(self, other):
+		return (self.base == other.base) and (self.dot == other.dot)
+
+
+	def __gt__(self, other):
+		return self.length > other.length
+
+
+	def __ge__(self, other):
+		return self.length >= other.length
+
+
+	def __lt__(self, other):
+		return self.length < other.length
+
+
+	def __le__(self, other):
+		return self.length <= other.length
+
+
 	def __str__(self):
 		list_index = self.bases.index(self.base)
 		basename = self.names[list_index]
