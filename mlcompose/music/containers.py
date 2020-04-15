@@ -666,12 +666,21 @@ class Duration(util.CheckArg):
 		return result
 
 
+	def __radd__(self, other):
+		return self.__add__(other)
+
+
 	def __sub__(self, other):
 		if isinstance(other, self.__class__):
 			result = self.length - other.length
 		else:
 			result = self.length - other
 		return result
+
+
+	def __rsub__(self, other):
+		# TODO:  add __rsub__ method
+		return
 
 
 	def __mul__(self, other):
@@ -682,12 +691,21 @@ class Duration(util.CheckArg):
 		return result
 
 
+	def __rmul__(self, other):
+		return self.__mul__(other)
+
+
 	def __truediv__(self, other):
 		if isinstance(other, self.__class__):
 			result = self.length / other.length
 		else:
 			result = Duration(self.base * other, dot=self.dot)
 		return result
+
+
+	def __rtruediv__(self, other):
+		# TODO:  add __rtruediv__ method
+		return
 
 
 	def __eq__(self, other):
