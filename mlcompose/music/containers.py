@@ -658,6 +658,38 @@ class Duration(util.CheckArg):
 	length = property(get_length, set_length)
 
 
+	def __add__(self, other):
+		if isinstance(other, self.__class__):
+			result = self.length + other.length
+		else:
+			result = self.length + other
+		return result
+
+
+	def __sub__(self, other):
+		if isinstance(other, self.__class__):
+			result = self.length - other.length
+		else:
+			result = self.length - other
+		return result
+
+
+	def __mul__(self, other):
+		if isinstance(other, self.__class__):
+			result = self.length * other.length
+		else:
+			result = Duration(self.base / other, dot=self.dot)
+		return result
+
+
+	def __truediv__(self, other):
+		if isinstance(other, self.__class__):
+			result = self.length / other.length
+		else:
+			result = Duration(self.base * other, dot=self.dot)
+		return result
+
+
 	def __eq__(self, other):
 		return (self.base == other.base) and (self.dot == other.dot)
 
