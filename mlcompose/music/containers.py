@@ -177,10 +177,7 @@ class Measure():
 			shortest_note = last_beat.shortest_note
 			ts = self.time_signature
 			total_duration = ts.numerator * Duration(ts.denominator)
-			passed_duration = Duration(0)
-			# TODO:  Measure get_complete method needs work...
-			for note in last_beat.notes:
-				passed_duration = passed_duration + note.offset
+			passed_duration = sum([beat.offset for beat in self.beats])
 			remaining_duration = total_duration - passed_duration
 			if shortest_note.duration == remaining_duration:
 				complete = True
@@ -729,23 +726,43 @@ class Duration(util.CheckArg):
 
 
 	def __eq__(self, other):
-		return (self.base == other.base) and (self.dot == other.dot)
+		if isinstance(other, self.__class__):
+			result = (self.base == other.base) and (self.dot == other.dot)
+		else:
+			result = self.length == other
+		return result
 
 
 	def __gt__(self, other):
-		return self.length > other.length
+		if isinstance(other, self.__class__):
+			result = self.length > other.length
+		else:
+			result = self.length > other
+		return result
 
 
 	def __ge__(self, other):
-		return self.length >= other.length
+		if isinstance(other, self.__class__):
+			result = self.length >= other.length
+		else:
+			result = self.length >= other
+		return result
 
 
 	def __lt__(self, other):
-		return self.length < other.length
+		if isinstance(other, self.__class__):
+			result = self.length < other.length
+		else:
+			result = self.length < other
+		return result
 
 
 	def __le__(self, other):
-		return self.length <= other.length
+		if isinstance(other, self.__class__):
+			result = self.length <= other.length
+		else:
+			result = self.length <= other
+		return result
 
 
 	def __str__(self):
