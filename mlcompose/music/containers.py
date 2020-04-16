@@ -593,8 +593,6 @@ class Duration(util.CheckArg):
 		self.dot = None
 		if base is not None:
 			self.set(base, mode, dot)
-		# TODO:  Add overloading methods for duration comparison
-		# TODO:  Add overloading methods for duration operators (add, etc.)
 
 
 	def set(self, base, mode='inverse', dot=False):
@@ -679,8 +677,11 @@ class Duration(util.CheckArg):
 
 
 	def __rsub__(self, other):
-		# TODO:  add __rsub__ method
-		return
+		if isinstance(other, self.__class__):
+			result = other.length - self.length
+		else:
+			result = other - self.length
+		return result
 
 
 	def __mul__(self, other):
@@ -704,8 +705,11 @@ class Duration(util.CheckArg):
 
 
 	def __rtruediv__(self, other):
-		# TODO:  add __rtruediv__ method
-		return
+		if isinstance(other, self.__class__):
+			result = other.length / self.length
+		else:
+			result = other / self.length
+		return result
 
 
 	def __eq__(self, other):
