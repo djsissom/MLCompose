@@ -608,6 +608,7 @@ class Duration(util.CheckArg):
 
 
 	def set(self, base, mode='inverse', dot=False):
+		# TODO:  Move string handling to set_name method
 		if (type(base) == str) and (base[:6].lower() == 'dotted'):
 			dot = True
 			base = base[7:]
@@ -623,6 +624,25 @@ class Duration(util.CheckArg):
 			raise AttributeError("Duration class mode options are 'inverse' and 'inverse_power'.")
 		self.dot = dot
 		return self
+
+
+	def set_name(self, name):
+		# TODO:  Allow setting duration name directly
+		print("Directly setting the name is not yet supported...skipping.")
+		return
+
+
+	def get_name(self):
+		list_index = self.bases.index(self.base)
+		basename = self.names[list_index]
+		if self.dot:
+			name = 'dotted ' + basename
+		else:
+			name = basename
+		return name
+
+
+	name = property(get_name, set_name)
 
 
 	def set_base(self, base):
@@ -766,13 +786,7 @@ class Duration(util.CheckArg):
 
 
 	def __str__(self):
-		list_index = self.bases.index(self.base)
-		basename = self.names[list_index]
-		if self.dot:
-			repstring = 'dotted ' + basename
-		else:
-			repstring = basename
-		return repstring
+		return self.name
 
 
 
