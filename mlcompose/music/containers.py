@@ -174,10 +174,11 @@ class Measure():
 		complete = self._complete
 		last_beat = self.beats[-1]
 		if not complete and last_beat.complete:
-			shortest_note = last_beat.min_note_length
+			shortest_note = last_beat.shortest_note
 			ts = self.time_signature
 			total_duration = ts.numerator * Duration(ts.denominator)
 			passed_duration = Duration(0)
+			# TODO:  Measure get_complete method needs work...
 			for note in last_beat.notes:
 				passed_duration = passed_duration + note.offset
 			remaining_duration = total_duration - passed_duration
@@ -209,9 +210,6 @@ class Beat():
 		self.notes = []
 		self.events = []
 		self.complete = False
-		# TODO:  Add methods for shortest and longest note durations in beat
-		# min_note_length
-		# max_note_length
 
 
 	def set_offset(self, offset):
@@ -241,6 +239,22 @@ class Beat():
 
 	complete = property(get_complete, set_complete)
 	ended = property(get_complete, set_complete)
+
+
+	def get_shortest_note(self):
+		short_note = min([(note.duration.length, note) for note in self.notes])[1]
+		return short_note
+
+
+	shortest_note = property(get_shortest_note)
+
+
+	def get_longest_note(self):
+		long_note = max([(note.duration.length, note) for note in self.notes])[1]
+		return long_note
+
+
+	longest_note = property(get_longest_note)
 
 
 	def add_note(self, note):
@@ -593,8 +607,7 @@ class Duration(util.CheckArg):
 		self.dot = None
 		if base is not None:
 			self.set(base, mode, dot)
-		# TODO:  Add overloading methods for duration comparison
-		# TODO:  Add overloading methods for duration operators (add, etc.)
+		# TODO:  Add name property so we don't have to always use a print statement
 
 
 	def set(self, base, mode='inverse', dot=False):
@@ -679,11 +692,15 @@ class Duration(util.CheckArg):
 
 
 	def __rsub__(self, other):
-		# TODO:  add __rsub__ method
-		return
+		if isinstance(other, self.__class__):
+			result = other.length - self.length
+		else:
+			result = other - self.length
+		return result
 
 
 	def __mul__(self, other):
+		# TODO:  Add a try clause to handle non-power-of-two lengths
 		if isinstance(other, self.__class__):
 			result = self.length * other.length
 		else:
@@ -704,8 +721,11 @@ class Duration(util.CheckArg):
 
 
 	def __rtruediv__(self, other):
-		# TODO:  add __rtruediv__ method
-		return
+		if isinstance(other, self.__class__):
+			result = other.length / self.length
+		else:
+			result = other / self.length
+		return result
 
 
 	def __eq__(self, other):
