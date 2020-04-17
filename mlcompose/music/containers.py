@@ -597,38 +597,41 @@ class Duration(util.CheckArg):
 		Specify whether the duration should be dotted.  If True, the base duration
 		is multiplied by 1.5 (e.g., a dotted quarter is three eighths).
 	'''
-	def __init__(self, base=None, mode='inverse', dot=False):
+	def __init__(self, base=None, mode='inverse', dot=False, name=None):
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
 		self.base = None
 		self.dot = None
-		if base is not None:
-			self.set(base, mode, dot)
-		# TODO:  Add name property so we don't have to always use a print statement
+		if (base is not None) or (name is not None):
+			self.set(base, mode, dot, name)
 
 
-	def set(self, base, mode='inverse', dot=False):
-		# TODO:  Move string handling to set_name method
-		if (type(base) == str) and (base[:6].lower() == 'dotted'):
-			dot = True
-			base = base[7:]
-		# TODO:  Some of this logic could probably move to set_base()
-		if (type(base) == str) and (base.lower() in self.names):
-			list_index = self.names.index(base.lower())
-			self.base = self.bases[list_index]
+	def set(self, base, mode='inverse', dot=False, name=None):
+		self.dot = dot
+		if type(base) == str:
+			name = base
+		if name is not None:
+			self.name = name
 		elif mode == 'inverse':
 			self.base = base
 		elif mode == 'inverse_power':
 			self.base = 2**base
 		else:
 			raise AttributeError("Duration class mode options are 'inverse' and 'inverse_power'.")
-		self.dot = dot
 		return self
 
 
 	def set_name(self, name):
-		# TODO:  Allow setting duration name directly
-		print("Directly setting the name is not yet supported...skipping.")
+		if type(name) is not str:
+			raise AttributeError("Duration class 'name' attribute must be a string.")
+		if name[:6].lower() == 'dotted':
+			self.dot = True
+			name = name[7:]
+		if name.lower() in self.names:
+			list_index = self.names.index(name.lower())
+			self.base = self.bases[list_index]
+		else:
+			raise AttributeError("Valid Duration names:  %s" % str(self.names))
 		return
 
 
