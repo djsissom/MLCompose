@@ -597,6 +597,7 @@ class Duration(util.CheckArg):
 		Specify whether the duration should be dotted.  If True, the base duration
 		is multiplied by 1.5 (e.g., a dotted quarter is three eighths).
 	'''
+	# TODO:  Update Duration class docstring with new options
 	def __init__(self, base=None, mode='inverse', dot=False, name=None):
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
@@ -720,11 +721,13 @@ class Duration(util.CheckArg):
 
 
 	def __mul__(self, other):
-		# TODO:  Add a try clause to handle non-power-of-two lengths
 		if isinstance(other, self.__class__):
 			result = self.length * other.length
 		else:
-			result = Duration(self.base / other, dot=self.dot)
+			try:
+				result = Duration(self.base / other, dot=self.dot)
+			except AttributeError:
+				result = self.length * other
 		return result
 
 
@@ -736,7 +739,10 @@ class Duration(util.CheckArg):
 		if isinstance(other, self.__class__):
 			result = self.length / other.length
 		else:
-			result = Duration(self.base * other, dot=self.dot)
+			try:
+				result = Duration(self.base * other, dot=self.dot)
+			except AttributeError:
+				result = self.length / other
 		return result
 
 
