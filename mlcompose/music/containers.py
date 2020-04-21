@@ -686,8 +686,10 @@ class Duration(util.CheckArg):
 
 
 	def get_length(self):
-		# TODO:  Fix get_length to handle zero length
-		length = 1. / self.base
+		if self.base == 0:
+			length = 0
+		else:
+			length = 1. / self.base
 		if self.dot:
 			length = length * 1.5
 		return length
