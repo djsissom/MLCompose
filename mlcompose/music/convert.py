@@ -43,6 +43,7 @@ def track_to_midi(track):
 	deactivation_queue = np.zeros(128, dtype=np.int) - 1
 
 	for measure in track.measures:
+		# TODO:  Handle key and time signature to create midi events
 		for beat in measure.beats:
 			ticks_to_beat = midi_length(beat.offset)
 
