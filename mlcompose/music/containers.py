@@ -188,14 +188,17 @@ class Measure():
 	complete = property(get_complete, set_complete)
 
 
-	def append_beat(self, beat=None):
-		# TODO:  Fix append beat offsets
-		# This should probably be where offset based on the previous beat is determined
+	def append_beat(self, beat=None, offset=None):
 		if beat is None:
-			if self.beats == []:
-				beat = Beat(offset=0)
-			else:
-				beat = Beat()
+			if offset is None:
+				if self.beats == []:
+					offset=0
+				else:
+					if self.beats[-1].notes == []:
+						offset = Duration(base=self.time_signature.denominator, mode='inverse')
+					else:
+						offset = self.beats[-1].shortest_note.duration
+			beat = Beat(offset=offset)
 		self.beats.append(beat)
 		return beat
 
@@ -683,6 +686,7 @@ class Duration(util.CheckArg):
 
 
 	def get_length(self):
+		# TODO:  Fix get_length to handle zero length
 		length = 1. / self.base
 		if self.dot:
 			length = length * 1.5
