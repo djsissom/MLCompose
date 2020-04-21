@@ -130,14 +130,13 @@ class Track():
 
 
 class Measure():
-	def __init__(self, key=None, time_signature=None, add_first_beat=True):
+	def __init__(self, key='C_Maj', time_signature='4/4', add_first_beat=True):
 		self.key = key
 		self.time_signature = time_signature
 		self.complete = False
 		self.beats = []
 		if add_first_beat:
 			self.append_beat()
-		# TODO:  Measure should initialize with default key and time sig
 
 
 	def set_key(self, keysig):
