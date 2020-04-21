@@ -186,6 +186,7 @@ class Composer():
 			last_measure = track.measures[-1]
 			if check_measure_complete(last_measure):
 				last_measure = track.append_measure()
+				# TODO:  Set new measure's key and time signatures
 			current_measures.append(last_measure)
 
 			last_beat = last_measure.beats[-1]
