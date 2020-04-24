@@ -173,20 +173,20 @@ class Composer():
 			self.set_control_signal
 		]
 		mode_function = mode_functions[max_mode_index]
+		# TODO:  Mode functions should be called with current measures and beats.
 		return mode_function(song)
 
 
 	def update_position(self, song=None):
-		'''Find the latest unfinished measures and beats.'''
+		'''Find the latest unfinished measure and beat for each track.'''
 		song = self.get_song(song)
 		current_measures = []
 		current_beats = []
 
 		for track in song.tracks:
 			last_measure = track.measures[-1]
-			if check_measure_complete(last_measure):
-				last_measure = track.append_measure()
-				# TODO:  Set new measure's key and time signatures
+			if last_measure.complete:
+				last_measure = track.append_measure(key=song.key, time_signature=song.time_signature)
 			current_measures.append(last_measure)
 
 			last_beat = last_measure.beats[-1]
@@ -197,19 +197,15 @@ class Composer():
 		return current_measures, current_beats
 
 
-	def check_measure_complete(self, measure):
-		# TODO:  test for complete measure
-		# Potentially add this to measure class instead...
-		return True
-
-
 	def end_song(self, song=None):
+		# TODO:  Mode functions should be called with current measures and beats.
 		song = self.get_song(song)
 		song.end_song()
 		return
 
 
 	def make_note(self, song=None, key=None):
+		# TODO:  Mode functions should be called with current measures and beats.
 		song = self.get_song(song)
 
 		# TODO:  This should depend on whether it's a real rest or ending a chord.
@@ -246,12 +242,14 @@ class Composer():
 
 
 	def set_rest(self, song=None):
+		# TODO:  Mode functions should be called with current measures and beats.
 		song = self.get_song(song)
 		# TODO:  actually do something here
 		return
 
 
 	def set_control_signal(self, song=None):
+		# TODO:  Mode functions should be called with current measures and beats.
 		song = self.get_song(song)
 		# TODO:  actually do something here
 		return
