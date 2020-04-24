@@ -113,9 +113,9 @@ class Track():
 	description = property(get_description, set_description)
 
 
-	def append_measure(self, measure=None):
+	def append_measure(self, measure=None, **kwargs):
 		if measure is None:
-			measure = Measure()
+			measure = Measure(**kwargs)
 		self.measures.append(measure)
 		return measure
 
