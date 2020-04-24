@@ -33,6 +33,8 @@ def main():
 
 
 class Song():
+	# TODO:  Add Song docstring.
+	# TODO:  Add Song str representation.
 	def __init__(self, key='C_Maj', time_signature='4/4', settings=None):
 		self.settings = settings
 		self.key = key
@@ -96,6 +98,8 @@ class Song():
 
 
 class Track():
+	# TODO:  Add Track docstring.
+	# TODO:  Add Track str representation.
 	def __init__(self, desc=None):
 		self.description = desc
 		self.measures = []
@@ -113,9 +117,9 @@ class Track():
 	description = property(get_description, set_description)
 
 
-	def append_measure(self, measure=None):
+	def append_measure(self, measure=None, **kwargs):
 		if measure is None:
-			measure = Measure()
+			measure = Measure(**kwargs)
 		self.measures.append(measure)
 		return measure
 
@@ -130,6 +134,8 @@ class Track():
 
 
 class Measure():
+	# TODO:  Add Measure docstring.
+	# TODO:  Add Measure str representation.
 	def __init__(self, key='C_Maj', time_signature='4/4', add_first_beat=True):
 		self.key = key
 		self.time_signature = time_signature
@@ -205,6 +211,8 @@ class Measure():
 
 
 class Beat():
+	# TODO:  Add Beat docstring.
+	# TODO:  Add Beat str representation.
 	def __init__(self, offset='quarter'):
 		self.offset = offset
 		self.notes = []
@@ -269,6 +277,7 @@ class Beat():
 
 
 class Note(util.CheckArg):
+	# TODO:  Add Note docstring.
 	def __init__(self, note=None, octave=5, duration='quarter', intensity=1.0, tie=False, enharmonic=None, name=None, value=None):
 		self.sharpnames = ('C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B')
 		self.flatnames  = ('C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B')
@@ -541,12 +550,14 @@ class Note(util.CheckArg):
 
 
 	def __str__(self):
+		# TODO:  Add more info to Note string representation.
 		repstring = self.name + '_' + str(self.octave)
 		return repstring
 
 
 
 class Rest():
+	# TODO:  Add Rest docstring.
 	def __init__(self, duration=None):
 		self.duration = duration
 
@@ -566,6 +577,7 @@ class Rest():
 
 
 class Event():
+	# TODO:  Add Event docstring.
 	def __init__(self, name=None, descr=None):
 		self.name = name
 		self.description = descr
@@ -578,7 +590,11 @@ class Duration(util.CheckArg):
 
 	Create a Duration object.  If no parameters are given, creates an
 	uninitialized instance.  Can be (re-)initialized with the set() method with
-	the same parameters.
+	the same parameters.  Durations can be compared with other instances of
+	Duration and number-based objects.  Durations can be added, subtracted,
+	multiplied and divided with other Duration instances and number-based
+	objects, returning either a new Duration instance or float number,
+	depending on what makes sense with the units and allowed duration lengths.
 
 	Parameters
 	----------
@@ -599,8 +615,13 @@ class Duration(util.CheckArg):
 	dot : bool (optional)
 		Specify whether the duration should be dotted.  If True, the base duration
 		is multiplied by 1.5 (e.g., a dotted quarter is three eighths).
+	name : str (optional)
+		Directly specify the duration name.  This follows the same
+		specification as the base parameter when base is a string.  If both
+		base and name are passed when setting the duration, overrides base
+		unless base is a string.  Respects the dot parameter unless name begins
+		with 'dotted', in which case dot is set to True.
 	'''
-	# TODO:  Update Duration class docstring with new options
 	def __init__(self, base=None, mode='inverse', dot=False, name=None):
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
@@ -1022,6 +1043,7 @@ class Key(util.CheckArg):
 
 
 	def __str__(self):
+		# TODO:  Move Key __str__ functionality to name property.
 		naccs = self.naccidentals
 		sf = self.sharp_flat
 		mm = self.major_minor
@@ -1090,6 +1112,7 @@ class TimeSignature(util.CheckArg):
 
 
 	def __str__(self):
+		# TODO:  Move TimeSig __str__ functionality to name property.
 		numer = self.numerator
 		denom = self.denominator
 		if (numer is not None) and (denom is not None):
