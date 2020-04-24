@@ -24,6 +24,7 @@ def main():
 
 
 class Composer():
+	# TODO:  Add Composer docstring.
 	def __init__(self, song=None):
 		# set default song to work on
 		self.song = song
@@ -173,8 +174,7 @@ class Composer():
 			self.set_control_signal
 		]
 		mode_function = mode_functions[max_mode_index]
-		# TODO:  Mode functions should be called with current measures and beats.
-		return mode_function(song)
+		return mode_function(song, current_measures, current_beats)
 
 
 	def update_position(self, song=None):
@@ -197,15 +197,13 @@ class Composer():
 		return current_measures, current_beats
 
 
-	def end_song(self, song=None):
-		# TODO:  Mode functions should be called with current measures and beats.
+	def end_song(self, song=None, current_measures=None, current_beats=None):
 		song = self.get_song(song)
 		song.end_song()
 		return
 
 
-	def make_note(self, song=None, key=None):
-		# TODO:  Mode functions should be called with current measures and beats.
+	def make_note(self, song=None, current_measures=None, current_beats=None):
 		song = self.get_song(song)
 
 		# TODO:  This should depend on whether it's a real rest or ending a chord.
@@ -213,6 +211,7 @@ class Composer():
 			self.set_rest()
 			return
 
+		# TODO:  This should get key from current measure.
 		if key is None:
 			key = song.key
 
@@ -241,15 +240,13 @@ class Composer():
 		return
 
 
-	def set_rest(self, song=None):
-		# TODO:  Mode functions should be called with current measures and beats.
+	def set_rest(self, song=None, current_measures=None, current_beats=None):
 		song = self.get_song(song)
 		# TODO:  actually do something here
 		return
 
 
-	def set_control_signal(self, song=None):
-		# TODO:  Mode functions should be called with current measures and beats.
+	def set_control_signal(self, song=None, current_measures=None, current_beats=None):
 		song = self.get_song(song)
 		# TODO:  actually do something here
 		return
