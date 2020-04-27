@@ -150,16 +150,19 @@ class Composer():
 	song = property(get_song, set_song)
 
 
-	def update(self, song=None):
+	def update(self, song=None, sync_measures=True):
 		'''
 		Update the song using the currently set control nodes.
 
 		This driver method should be called after updating the nodes attribute
 		of the Composer.  The update method reads the currently activated
-		control nodes and adds to/modifies the song accordingly.
+		control nodes and adds to/modifies the song accordingly.  The
+		sync_measures option forces all tracks to compose the same measure
+		simultaneously when True or allows composing each track independently
+		when False.
 		'''
 		song = self.get_song(song)
-		current_measures, current_beats = update_position(song)
+		measure, beat = update_position(song, sync_measures)
 
 		mode_list = np.array([
 			self.endsong_node,
@@ -174,10 +177,10 @@ class Composer():
 			self.set_control_signal
 		]
 		mode_function = mode_functions[max_mode_index]
-		return mode_function(song, current_measures, current_beats)
+		return mode_function(song, measure, beat)
 
 
-	def update_position(self, song=None):
+	def update_position(self, song=None, sync_measures=True):
 		'''Find the latest unfinished measure and beat for each track.'''
 		song = self.get_song(song)
 		current_measures = []
@@ -194,16 +197,27 @@ class Composer():
 				last_beat = last_measure.append_beat()
 			current_beats.append(last_beat)
 
-		return current_measures, current_beats
+		active_track = self.hand_nodes.argmax()
+		if sync_measures:
+			# TODO:  Implement sync_measures in update_position
+			# TODO:  Don't allow moving to the next measure in one hand if the other isn't finished
+			# TODO:  Alternatively, force finish hand's measure if other is moving on
+			#if current_measures[active_track].complete
+			pass
+
+		measure = current_measures[active_track]
+		beat = current_beats[active_track]
+
+		return measure, beat
 
 
-	def end_song(self, song=None, current_measures=None, current_beats=None):
+	def end_song(self, song=None, measure=None, beat=None):
 		song = self.get_song(song)
 		song.end_song()
 		return
 
 
-	def make_note(self, song=None, current_measures=None, current_beats=None):
+	def make_note(self, song=None, measure=None, beat=None):
 		song = self.get_song(song)
 
 		# TODO:  This should depend on whether it's a real rest or ending a chord.
@@ -240,13 +254,13 @@ class Composer():
 		return
 
 
-	def set_rest(self, song=None, current_measures=None, current_beats=None):
+	def set_rest(self, song=None, measure=None, beat=None):
 		song = self.get_song(song)
 		# TODO:  actually do something here
 		return
 
 
-	def set_control_signal(self, song=None, current_measures=None, current_beats=None):
+	def set_control_signal(self, song=None, measure=None, beat=None):
 		song = self.get_song(song)
 		# TODO:  actually do something here
 		return
