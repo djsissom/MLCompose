@@ -183,11 +183,15 @@ class Composer():
 	def update_position(self, song=None, sync_measures=True):
 		'''Find the latest unfinished measure and beat for each track.'''
 		song = self.get_song(song)
+		active_track = self.hand_nodes.argmax()
+		pad = (sync_measures and track[active_track].measures[-1].complete)
 		current_measures = []
 		current_beats = []
 
 		for track in song.tracks:
 			last_measure = track.measures[-1]
+			if pad and not last_measure.complete:
+					last_measure.pad_rests()
 			if last_measure.complete:
 				last_measure = track.append_measure(key=song.key, time_signature=song.time_signature)
 			current_measures.append(last_measure)
@@ -197,17 +201,8 @@ class Composer():
 				last_beat = last_measure.append_beat()
 			current_beats.append(last_beat)
 
-		active_track = self.hand_nodes.argmax()
-		if sync_measures:
-			# TODO:  Implement sync_measures in update_position
-			# TODO:  Don't allow moving to the next measure in one hand if the other isn't finished
-			# TODO:  Alternatively, force finish hand's measure if other is moving on
-			#if current_measures[active_track].complete
-			pass
-
 		measure = current_measures[active_track]
 		beat = current_beats[active_track]
-
 		return measure, beat
 
 

@@ -209,6 +209,11 @@ class Measure():
 		return beat
 
 
+	def pad_rests(self):
+		# TODO:  Add pad_rests method to Measure class.
+		return
+
+
 
 class Beat():
 	# TODO:  Add Beat docstring.
