@@ -185,8 +185,6 @@ class Composer():
 		song = self.get_song(song)
 		active_track = self.hand_nodes.argmax()
 		pad = (sync_measures and track[active_track].measures[-1].complete)
-		current_measures = []
-		current_beats = []
 
 		for track in song.tracks:
 			last_measure = track.measures[-1]
@@ -194,15 +192,13 @@ class Composer():
 					last_measure.pad_rests()
 			if last_measure.complete:
 				last_measure = track.append_measure(key=song.key, time_signature=song.time_signature)
-			current_measures.append(last_measure)
 
 			last_beat = last_measure.beats[-1]
 			if last_beat.complete:
 				last_beat = last_measure.append_beat()
-			current_beats.append(last_beat)
 
-		measure = current_measures[active_track]
-		beat = current_beats[active_track]
+		measure = track[active_track].measures[-1]
+		beat = measure.beats[-1]
 		return measure, beat
 
 
