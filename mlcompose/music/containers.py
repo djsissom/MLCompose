@@ -232,7 +232,31 @@ class Measure():
 
 
 	def pad_rests(self):
-		# TODO:  Add pad_rests method to Measure class.
+		# TODO:  This needs an extensive unit test.
+		last_beat = self.beats[-1]
+		if last_beat.notes == []:
+			remaining_durations = [self.get_remaining_duration(beat=last_beat)]
+			offset = 0
+		else:
+			remaining_durations = [
+				self.get_remaining_duration(beat=last_beat, note=note)
+				for note
+				in last_beat.notes
+			]
+			offset = last_beat.shortest_note
+
+		# remove duplicates from remaining_durations list
+		remaining_durations = list(set(remaining_durations))
+		remaining_durations.sort(reverse=True)
+
+		previous_remaining_duration = remaining_durations + offset
+		for remaining_duration in remaining_durations:
+			beat = self.append_beat(offset=offset)
+			beat.add_note(Rest(remaining_duration))
+			offset = previous_remaining_duration - remaining_duration
+			previous_remaining_duration = remaining_duration
+
+		self.complete = True
 		return
 
 
@@ -650,6 +674,7 @@ class Duration(util.CheckArg):
 		with 'dotted', in which case dot is set to True.
 	'''
 	def __init__(self, base=None, mode='inverse', dot=False, name=None):
+		# TODO:  Need to update Duration class to allow initialization with lengths (e.g. setting offsets).
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
 		self.base = None
@@ -746,6 +771,7 @@ class Duration(util.CheckArg):
 	length = property(get_length, set_length)
 
 
+	# TODO:  Update Duration operators to be better at returning Duration instances.
 	def __add__(self, other):
 		if isinstance(other, self.__class__):
 			result = self.length + other.length
