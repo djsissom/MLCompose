@@ -179,19 +179,41 @@ class Measure():
 	def get_complete(self):
 		complete = self._complete
 		last_beat = self.beats[-1]
-		if not complete and last_beat.complete:
-			shortest_note = last_beat.shortest_note
-			ts = self.time_signature
-			total_duration = ts.numerator * Duration(ts.denominator)
-			passed_duration = sum([beat.offset for beat in self.beats])
-			remaining_duration = total_duration - passed_duration
-			if shortest_note.duration == remaining_duration:
+		if not complete and last_beat.complete and self.remaining_duration == 0:
 				complete = True
 				self.complete = complete
 		return complete
 
 
 	complete = property(get_complete, set_complete)
+
+
+	def get_remaining_duration(self, beat=None, note=None, method='min'):
+		if note == None:
+			if beat == None:
+				beat = self.beats[-1]
+			if beat.notes == []:
+				note = Note('C', duration=0)  # make a dummy note with zero duration for calculations
+			elif method[:3].lower() == 'min' or method[:5].lower() == 'short':
+				note = beat.shortest_note
+			elif method[:3].lower() == 'max' or method[:4].lower() == 'long':
+				note = beat.longest_note
+			else:
+				raise AttributeError("Allowed methods for get_remaining_duration are 'min'/'short' and 'max'/'long'")
+		elif beat == None:
+			for potential_beat in self.beats:
+				if note in potential_beat.notes:
+					beat = potential_beat
+		beat_index = self.beats.index(beat)
+		ts = self.time_signature
+		total_duration = ts.numerator * Duration(ts.denominator)
+		passed_duration = sum([beat.offset for beat in self.beats[:beat_index + 1]])
+		passed_duration = passed_duration + note.duration
+		remaining_duration = total_duration - passed_duration
+		return remaining_duration
+
+
+	remining_duration = property(get_remaining_duration)
 
 
 	def append_beat(self, beat=None, offset=None):
@@ -207,6 +229,35 @@ class Measure():
 			beat = Beat(offset=offset)
 		self.beats.append(beat)
 		return beat
+
+
+	def pad_rests(self):
+		# TODO:  This needs an extensive unit test.
+		last_beat = self.beats[-1]
+		if last_beat.notes == []:
+			remaining_durations = [self.get_remaining_duration(beat=last_beat)]
+			offset = 0
+		else:
+			remaining_durations = [
+				self.get_remaining_duration(beat=last_beat, note=note)
+				for note
+				in last_beat.notes
+			]
+			offset = last_beat.shortest_note
+
+		# remove duplicates from remaining_durations list
+		remaining_durations = list(set(remaining_durations))
+		remaining_durations.sort(reverse=True)
+
+		previous_remaining_duration = remaining_durations + offset
+		for remaining_duration in remaining_durations:
+			beat = self.append_beat(offset=offset)
+			beat.add_note(Rest(remaining_duration))
+			offset = previous_remaining_duration - remaining_duration
+			previous_remaining_duration = remaining_duration
+
+		self.complete = True
+		return
 
 
 
@@ -623,6 +674,7 @@ class Duration(util.CheckArg):
 		with 'dotted', in which case dot is set to True.
 	'''
 	def __init__(self, base=None, mode='inverse', dot=False, name=None):
+		# TODO:  Need to update Duration class to allow initialization with lengths (e.g. setting offsets).
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
 		self.base = None
@@ -719,6 +771,7 @@ class Duration(util.CheckArg):
 	length = property(get_length, set_length)
 
 
+	# TODO:  Update Duration operators to be better at returning Duration instances.
 	def __add__(self, other):
 		if isinstance(other, self.__class__):
 			result = self.length + other.length
