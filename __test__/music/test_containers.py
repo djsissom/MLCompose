@@ -6,15 +6,15 @@ from mlcompose import music as mus
 
 
 class TestMeasure(unittest.TestCase):
-	def test_something(self):
-		song = mus.Song()
-		track = song.add_track()
-		measure = track.append_measure()
-		beat = measure.append_beat()
+	# TODO:  Write Measure tests.
+	def test_get_remaining_duration(self):
+		measure = mus.Measure()
+		#beat = measure.append_beat()
+		beat = measure.beats[0]
 		note = beat.add_note(mus.Note('C_6'))
-		song.end_song()
-		#self.assertTrue(a is b)
-		# TODO:  write Measure tests
+		measure.pad_rests()
+		for beat in measure.beats:
+			print(beat)
 		return
 
 
