@@ -243,15 +243,17 @@ class Measure():
 				for note
 				in last_beat.notes
 			]
-			offset = last_beat.shortest_note
+			offset = last_beat.shortest_note.duration
 
 		# remove duplicates from remaining_durations list
 		remaining_durations = list(set(remaining_durations))
 		remaining_durations.sort(reverse=True)
 
-		previous_remaining_duration = remaining_durations + offset
+		# TODO:  Fix this...
+		previous_remaining_duration = remaining_durations[0] + offset
 		for remaining_duration in remaining_durations:
 			beat = self.append_beat(offset=offset)
+			# TODO:  This needs to recurse to add multiple beats/notes if Duration isn't expanded.
 			beat.add_note(Rest(remaining_duration))
 			offset = previous_remaining_duration - remaining_duration
 			previous_remaining_duration = remaining_duration
@@ -727,7 +729,7 @@ class Duration(util.CheckArg):
 
 	def set_base(self, base):
 		if (base not in self.bases) and (base is not None):
-			raise AttributeError("Duration base must be a power of 2 between 1 and 64.")
+			raise AttributeError(f"Attempted to set base {base}.  Duration base must be a power of 2 between 1 and 64.")
 		self._base = base
 		return
 
