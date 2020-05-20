@@ -2,7 +2,6 @@
 
 import midi
 import numpy as np
-from ipdb import set_trace
 
 from .. import util
 from .. import music
