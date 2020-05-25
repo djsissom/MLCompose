@@ -692,26 +692,36 @@ class Duration(util.CheckArg):
 		duration is multiplied by 1.5 (e.g., a dotted quarter is three
 		eighths).
 	'''
-	def __init__(self, base=None, mode='inverse', dot=False, name=None):
-		# TODO:  Update init and set to add duration, name, and count parameters.
+	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False):
 		# TODO:  Add count property.
-		# TODO:  Update set method to handle setting count, name, base, duration.
 		# TODO:  Need to update Duration class to allow initialization with lengths (e.g. setting offsets).
 		# TODO:  Decide how to handle triplets.
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
 		self.base = None
 		self.dot = None
-		if (base is not None) or (name is not None):
-			self.set(base, mode, dot, name)
+		if (duration is not None) or (name is not None) or (length is not None) or (base is not None):
+			self.set(duration, name, length, count, base, mode, dot)
 
 
-	def set(self, base, mode='inverse', dot=False, name=None):
+	def set(self, duration=None, name=None, length=None, count=1, base=None, mode='inverse', dot=False):
+		if (duration is None) and (name is None) and (length is None) and (base is None):
+			raise AttributeError("Setting a Duration requires setting at least one parameter.")
+		self.count = count
 		self.dot = dot
-		if type(base) == str:
-			name = base
+
+		if duration is not None:
+			if (name is None) and (type(duration) == str):
+				name = duration
+			elif (length is None) and (duration < 1):
+				length = duration
+			elif (base is None) and (duration >= 1):
+				base = duration
+
 		if name is not None:
 			self.name = name
+		elif length is not None:
+			self.length = length
 		elif mode == 'inverse':
 			self.base = base
 		elif mode == 'inverse_power':
