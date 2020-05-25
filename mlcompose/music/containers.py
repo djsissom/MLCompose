@@ -638,7 +638,7 @@ class Event():
 
 class Duration(util.CheckArg):
 	'''
-	Duration(duration=None, name=None, length=None, count=1, base=None, mode='inverse', dot=False)
+	Duration(duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False)
 
 	Create a Duration object.  If no parameters are given, creates an
 	uninitialized instance.  Can be (re-)initialized with the set() method with
@@ -674,8 +674,6 @@ class Duration(util.CheckArg):
 		values (e.g. length=0.5 sets the duration as one half note instead of
 		two quarter notes) unless the count or base parameters are explicitly
 		specified.
-	count : int (optional)
-		Specify how many occurrences of the base comprise the duration length.
 	base : int power of 2 <= 64 or int <= 6 (optional)
 		Specify the duration base.  Allowed values are powers of 2 between 1
 		and 64 if mode is 'inverse' (where '1' is a whole note and '64' is a
@@ -683,6 +681,8 @@ class Duration(util.CheckArg):
 		'inverse_power' (where 0 is a whole note and 6 is a sixty-fourth note).
 		The special case of a zero-length duration is created by setting base
 		to 'zero' or 0 with mode set to the default 'inverse'.
+	count : int (optional)
+		Specify how many occurrences of the base comprise the duration length.
 	mode : {'inverse', 'inverse_power'} (optional)
 		Select between specifying the base as a power of two directly
 		('inverse') or the exponent with which to raise 2 ('inverse_power').
