@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+from math import isclose
 from itertools import cycle
 
 from . import convert
@@ -697,6 +698,7 @@ class Duration(util.CheckArg):
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
 		self.base = None
+		self.count = None
 		self.dot = None
 		if (duration is not None) or (name is not None) or (length is not None) or (base is not None):
 			self.set(duration, name, length, count, base, mode, dot)
@@ -719,7 +721,7 @@ class Duration(util.CheckArg):
 		if name is not None:
 			self.name = name
 		elif length is not None:
-			self.length = length
+			self.set_length(length, base=base)
 		elif mode == 'inverse':
 			self.base = base
 		elif mode == 'inverse_power':
@@ -771,7 +773,7 @@ class Duration(util.CheckArg):
 
 
 	def set_count(self, count):
-		if type(count) is not int:
+		if (count is not None) and (type(count) is not int):
 			print("Warning:  converting Duration count to type int.")
 			count = int(count)
 		self._count = count
@@ -800,19 +802,58 @@ class Duration(util.CheckArg):
 	dot = property(get_dot, set_dot)
 
 
-	# TODO:  Need to update Duration class to allow initialization with lengths (e.g. setting offsets).
-	def set_length(self, length):
-		print('Warning:  Duration lengths are set via the base and dot attributes...skipping.')
+	def set_length(self, length, base=None, count=None, dot=None):
+		if length is None:
+			self.count = None
+		elif length == 0:
+			self.base = 0
+			self.count = 0
+		elif self.length != length:
+			if dot is None:
+				if self.dot is not None:
+					dot = self.dot
+				else:
+					dot = False
+
+			if count is None:
+				if self.count is not None:
+					count = self.count
+				else:
+					count = 1
+
+			if base is None:
+				if self.base is not None:
+					base = self.base
+				else:
+					base = 1
+
+			if length != dot * count / base:
+				for testbase in self.bases[:-1]:
+					# TODO:  Try with and without dot.
+					testcount = length * testbase
+					count = round(testcount)
+					base = testbase
+					if isclose(testcount % 1, 0):
+						break
+					if testbase == self.bases[-2]:
+						print(f"Warning:  Rounding Duration to nearest {self.bases[-2]}th note.")
+
+			self.base = base
+			self.count = count
+			self.dot = dot
 		return
 
 
 	def get_length(self):
-		if self.base == 0:
-			length = 0
+		if self.base is None:
+			length = None
 		else:
-			length = self.count / self.base
-		if self.dot:
-			length = length * 1.5
+			if self.base == 0:
+				length = 0
+			else:
+				length = self.count / self.base
+			if self.dot:
+				length = length * 1.5
 		return length
 
 
