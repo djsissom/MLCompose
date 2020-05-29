@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+from math import isclose
 from itertools import cycle
 
 from . import convert
@@ -638,7 +639,7 @@ class Event():
 
 class Duration(util.CheckArg):
 	'''
-	Duration(base=None, mode='inverse', dot=False)
+	Duration(duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False)
 
 	Create a Duration object.  If no parameters are given, creates an
 	uninitialized instance.  Can be (re-)initialized with the set() method with
@@ -647,49 +648,80 @@ class Duration(util.CheckArg):
 	multiplied and divided with other Duration instances and number-based
 	objects, returning either a new Duration instance or float number,
 	depending on what makes sense with the units and allowed duration lengths.
+	It is generally advisable to not set durations longer than a measure and to
+	instead set the tie flag for the note or rest to carry over to another
+	instance in the next measure.
 
 	Parameters
 	----------
-	base : str, int power of 2 <= 64, int <= 6, or Duration instance (optional)
-		The note or rest duration base.  If a string is passed, allowed names
-		are English note names between 'whole' and 'sixty-fourth', optionally
-		prepended with 'dotted ' to override and enable the dot option, for
-		example: 'dotted thirty-second'.  If an integer is passed, allowed
-		values are powers of 2 between 1 and 64 if mode is 'inverse' or
-		integers between 0 and 6 if mode is 'inverse_power'.  The special case
-		of a zero-length duration is created by setting base to 'zero' or 0
-		with mode set to the default 'inverse'.  If an existing Duration object
-		is given, setup is skipped and that object is returned.
+	duration : str, float, int power of 2 <= 64, int <= 6, or Duration instance (optional)
+		The note or rest generalized duration parameter.  This attempts to
+		determine the intended other remaining parameters based on the value
+		and type of the argument.  If a string is passed, this is treated as
+		the name parameter.  If an integer or float is passed, this is treated
+		as the length parameter for values less than one or the base parameter
+		for values greater than one.  If an existing Duration object is given,
+		setup is skipped and that object is returned.
+	name : str (optional)
+		Specify the duration name.  Allowed names are English note names
+		between 'whole' and 'sixty-fourth', optionally prepended with 'dotted '
+		to override and enable the dot option (e.g. 'dotted thirty-second').
+		If both base and name are passed when setting the duration, overrides
+		base.  Respects the dot parameter unless name begins with 'dotted', in
+		which case dot is set to True.
+	length : float or int (optional)
+		Specify the duration length.  This is the count divided by the duration
+		base.  Ambiguous lengths set the count and base to the smallest valid
+		values (e.g. length=0.5 sets the duration as one half note instead of
+		two quarter notes) unless the count or base parameters are explicitly
+		specified.
+	base : int power of 2 <= 64 or int <= 6 (optional)
+		Specify the duration base.  Allowed values are powers of 2 between 1
+		and 64 if mode is 'inverse' (where '1' is a whole note and '64' is a
+		sixty-fourth note) or integers between 0 and 6 if mode is
+		'inverse_power' (where 0 is a whole note and 6 is a sixty-fourth note).
+		The special case of a zero-length duration is created by setting base
+		to 'zero' or 0 with mode set to the default 'inverse'.
+	count : int (optional)
+		Specify how many occurrences of the base comprise the duration length.
 	mode : {'inverse', 'inverse_power'} (optional)
 		Select between specifying the base as a power of two directly
 		('inverse') or the exponent with which to raise 2 ('inverse_power').
 		This option is ignored if base is a string.
 	dot : bool (optional)
-		Specify whether the duration should be dotted.  If True, the base duration
-		is multiplied by 1.5 (e.g., a dotted quarter is three eighths).
-	name : str (optional)
-		Directly specify the duration name.  This follows the same
-		specification as the base parameter when base is a string.  If both
-		base and name are passed when setting the duration, overrides base
-		unless base is a string.  Respects the dot parameter unless name begins
-		with 'dotted', in which case dot is set to True.
+		Specify whether the duration should be dotted.  If True, the base
+		duration is multiplied by 1.5 (e.g., a dotted quarter is three
+		eighths).
 	'''
-	def __init__(self, base=None, mode='inverse', dot=False, name=None):
-		# TODO:  Need to update Duration class to allow initialization with lengths (e.g. setting offsets).
+	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False):
+		# TODO:  Decide how to handle triplets.
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
 		self.base = None
+		self.count = None
 		self.dot = None
-		if (base is not None) or (name is not None):
-			self.set(base, mode, dot, name)
+		if (duration is not None) or (name is not None) or (length is not None) or (base is not None):
+			self.set(duration, name, length, count, base, mode, dot)
 
 
-	def set(self, base, mode='inverse', dot=False, name=None):
+	def set(self, duration=None, name=None, length=None, count=1, base=None, mode='inverse', dot=False):
+		if (duration is None) and (name is None) and (length is None) and (base is None):
+			raise AttributeError("Setting a Duration requires setting at least one parameter.")
+		self.count = count
 		self.dot = dot
-		if type(base) == str:
-			name = base
+
+		if duration is not None:
+			if (name is None) and (type(duration) == str):
+				name = duration
+			elif (length is None) and (duration < 1):
+				length = duration
+			elif (base is None) and (duration >= 1):
+				base = duration
+
 		if name is not None:
 			self.name = name
+		elif length is not None:
+			self.set_length(length, base=base)
 		elif mode == 'inverse':
 			self.base = base
 		elif mode == 'inverse_power':
@@ -740,6 +772,22 @@ class Duration(util.CheckArg):
 	base = property(get_base, set_base)
 
 
+	def set_count(self, count):
+		if (count is not None) and (type(count) is not int):
+			print("Warning:  converting Duration count to type int.")
+			count = int(count)
+		self._count = count
+		return
+
+
+	def get_count(self):
+		count = self._count
+		return count
+
+
+	count = property(get_count, set_count)
+
+
 	def set_dot(self, dot):
 		if (type(dot) is not bool) and (dot is not None):
 			raise AttributeError("Duration class dot attribute must be True or False.")
@@ -754,18 +802,58 @@ class Duration(util.CheckArg):
 	dot = property(get_dot, set_dot)
 
 
-	def set_length(self, length):
-		print('Warning:  Duration lengths are set via the base and dot attributes...skipping.')
+	def set_length(self, length, base=None, count=None, dot=None):
+		if length is None:
+			self.count = None
+		elif length == 0:
+			self.base = 0
+			self.count = 0
+		elif self.length != length:
+			if dot is None:
+				if self.dot is not None:
+					dot = self.dot
+				else:
+					dot = False
+
+			if count is None:
+				if self.count is not None:
+					count = self.count
+				else:
+					count = 1
+
+			if base is None:
+				if self.base is not None:
+					base = self.base
+				else:
+					base = 1
+
+			if length != dot * count / base:
+				for testbase in self.bases[:-1]:
+					# TODO:  Try with and without dot.
+					testcount = length * testbase
+					count = round(testcount)
+					base = testbase
+					if isclose(testcount % 1, 0):
+						break
+					if testbase == self.bases[-2]:
+						print(f"Warning:  Rounding Duration to nearest {self.bases[-2]}th note.")
+
+			self.base = base
+			self.count = count
+			self.dot = dot
 		return
 
 
 	def get_length(self):
-		if self.base == 0:
-			length = 0
+		if self.base is None:
+			length = None
 		else:
-			length = 1. / self.base
-		if self.dot:
-			length = length * 1.5
+			if self.base == 0:
+				length = 0
+			else:
+				length = self.count / self.base
+			if self.dot:
+				length = length * 1.5
 		return length
 
 
