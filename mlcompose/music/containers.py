@@ -693,7 +693,6 @@ class Duration(util.CheckArg):
 		eighths).
 	'''
 	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False):
-		# TODO:  Add count property.
 		# TODO:  Need to update Duration class to allow initialization with lengths (e.g. setting offsets).
 		# TODO:  Decide how to handle triplets.
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
@@ -770,6 +769,22 @@ class Duration(util.CheckArg):
 
 
 	base = property(get_base, set_base)
+
+
+	def set_count(self, count):
+		if type(count) is not int:
+			print("Warning:  converting Duration count to type int.")
+			count = int(count)
+		self._count = count
+		return
+
+
+	def get_count(self):
+		count = self._count
+		return count
+
+
+	count = property(get_count, set_count)
 
 
 	def set_dot(self, dot):
