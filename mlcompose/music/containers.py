@@ -693,7 +693,6 @@ class Duration(util.CheckArg):
 		eighths).
 	'''
 	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False):
-		# TODO:  Need to update Duration class to allow initialization with lengths (e.g. setting offsets).
 		# TODO:  Decide how to handle triplets.
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
@@ -801,6 +800,7 @@ class Duration(util.CheckArg):
 	dot = property(get_dot, set_dot)
 
 
+	# TODO:  Need to update Duration class to allow initialization with lengths (e.g. setting offsets).
 	def set_length(self, length):
 		print('Warning:  Duration lengths are set via the base and dot attributes...skipping.')
 		return
@@ -810,7 +810,7 @@ class Duration(util.CheckArg):
 		if self.base == 0:
 			length = 0
 		else:
-			length = 1. / self.base
+			length = self.count / self.base
 		if self.dot:
 			length = length * 1.5
 		return length
