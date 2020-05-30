@@ -758,50 +758,6 @@ class Duration(util.CheckArg):
 	name = property(get_name, set_name)
 
 
-	def set_base(self, base):
-		if (base not in self.bases) and (base is not None):
-			raise AttributeError(f"Attempted to set base {base}.  Duration base must be a power of 2 between 1 and 64.")
-		self._base = base
-		return
-
-
-	def get_base(self):
-		return self._base
-
-
-	base = property(get_base, set_base)
-
-
-	def set_count(self, count):
-		if (count is not None) and (type(count) is not int):
-			print("Warning:  converting Duration count to type int.")
-			count = int(count)
-		self._count = count
-		return
-
-
-	def get_count(self):
-		count = self._count
-		return count
-
-
-	count = property(get_count, set_count)
-
-
-	def set_dot(self, dot):
-		if (type(dot) is not bool) and (dot is not None):
-			raise AttributeError("Duration class dot attribute must be True or False.")
-		self._dot = dot
-		return
-
-
-	def get_dot(self):
-		return self._dot
-
-
-	dot = property(get_dot, set_dot)
-
-
 	def set_length(self, length, base=None, count=None, dot=None):
 		if length is None:
 			self.count = None
@@ -858,6 +814,50 @@ class Duration(util.CheckArg):
 
 
 	length = property(get_length, set_length)
+
+
+	def set_base(self, base):
+		if (base not in self.bases) and (base is not None):
+			raise AttributeError(f"Attempted to set base {base}.  Duration base must be a power of 2 between 1 and 64.")
+		self._base = base
+		return
+
+
+	def get_base(self):
+		return self._base
+
+
+	base = property(get_base, set_base)
+
+
+	def set_count(self, count):
+		if (count is not None) and (type(count) is not int):
+			print("Warning:  converting Duration count to type int.")
+			count = int(count)
+		self._count = count
+		return
+
+
+	def get_count(self):
+		count = self._count
+		return count
+
+
+	count = property(get_count, set_count)
+
+
+	def set_dot(self, dot):
+		if (type(dot) is not bool) and (dot is not None):
+			raise AttributeError("Duration class dot attribute must be True or False.")
+		self._dot = dot
+		return
+
+
+	def get_dot(self):
+		return self._dot
+
+
+	dot = property(get_dot, set_dot)
 
 
 	# TODO:  Update Duration operators to be better at returning Duration instances.
