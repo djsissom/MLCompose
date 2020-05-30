@@ -759,55 +759,59 @@ class Duration(util.CheckArg):
 
 
 	def set_length(self, length, base=None, count=None, dot=None):
-		if length is None:
+		if self.length == length:
+			return
+		elif length is None:
 			self.count = None
+			return
 		elif length == 0:
 			self.base = 0
 			self.count = 0
-		elif self.length != length:
-			if dot is None:
-				if self.dot is not None:
-					dot = self.dot
-				else:
-					dot = False
+			return
 
-			if count is None:
-				if self.count is not None:
-					count = self.count
-				else:
-					count = 1
-
-			if base is None:
-				if self.base is not None:
-					base = self.base
-				else:
-					base = 1
-
-			if dot:
-				dotval = 1.5
+		if dot is None:
+			if self.dot is not None:
+				dot = self.dot
 			else:
-				dotval = 1.0
-
-			if length != dotval * count / base:
 				dot = False
-				for testbase in self.bases[:-1]:
-					testcount = length * testbase
-					testcount_dot = testcount / 1.5
-					base = testbase
-					if isclose(testcount % 1, 0):
-						count = round(testcount)
-						break
-					elif isclose(testcount_dot % 1, 0):
-						count = round(testcount_dot)
-						dot = True
-						break
-					elif testbase == self.bases[-2]:
-						count = round(testcount)
-						print(f"Warning:  Rounding Duration to nearest {self.bases[-2]}th note.")
 
-			self.base = base
-			self.count = count
-			self.dot = dot
+		if count is None:
+			if self.count is not None:
+				count = self.count
+			else:
+				count = 1
+
+		if base is None:
+			if self.base is not None:
+				base = self.base
+			else:
+				base = 1
+
+		if dot:
+			dotval = 1.5
+		else:
+			dotval = 1.0
+
+		if length != dotval * count / base:
+			dot = False
+			for testbase in self.bases[:-1]:
+				testcount = length * testbase
+				testcount_dot = testcount / 1.5
+				base = testbase
+				if isclose(testcount % 1, 0):
+					count = round(testcount)
+					break
+				elif isclose(testcount_dot % 1, 0):
+					count = round(testcount_dot)
+					dot = True
+					break
+				elif testbase == self.bases[-2]:
+					count = round(testcount)
+					print(f"Warning:  Rounding Duration to nearest {self.bases[-2]}th note.")
+
+		self.base = base
+		self.count = count
+		self.dot = dot
 		return
 
 
