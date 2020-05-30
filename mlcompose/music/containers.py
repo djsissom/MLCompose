@@ -783,15 +783,26 @@ class Duration(util.CheckArg):
 				else:
 					base = 1
 
-			if length != dot * count / base:
+			if dot:
+				dotval = 1.5
+			else:
+				dotval = 1.0
+
+			if length != dotval * count / base:
+				dot = False
 				for testbase in self.bases[:-1]:
-					# TODO:  Try with and without dot.
 					testcount = length * testbase
-					count = round(testcount)
+					testcount_dot = testcount / 1.5
 					base = testbase
 					if isclose(testcount % 1, 0):
+						count = round(testcount)
 						break
-					if testbase == self.bases[-2]:
+					elif isclose(testcount_dot % 1, 0):
+						count = round(testcount_dot)
+						dot = True
+						break
+					elif testbase == self.bases[-2]:
+						count = round(testcount)
 						print(f"Warning:  Rounding Duration to nearest {self.bases[-2]}th note.")
 
 			self.base = base
