@@ -718,10 +718,11 @@ class Duration(util.CheckArg):
 			elif (base is None) and (duration >= 1):
 				base = duration
 
+		# TODO:  Move Duration mode check to before setting length or base.
 		if name is not None:
 			self.name = name
 		elif length is not None:
-			self.set_length(length, base=base)
+			self.set_length(length, base=base, count=count)
 		elif mode == 'inverse':
 			self.base = base
 		elif mode == 'inverse_power':
@@ -759,55 +760,88 @@ class Duration(util.CheckArg):
 
 
 	def set_length(self, length, base=None, count=None, dot=None):
-		if self.length == length:
-			return
+		finished = False
+		dotval = {False: 1.0, True: 1.5}
+		if count == 1:
+			count = None
+		if (length == self.length) and (base is None) and (count is None) and (dot is None):
+			base = self.base
+			count = self.count
+			dot = self.dot
+			finished = True
 		elif length is None:
-			self.count = None
-			return
+			count = None
+			finished = True
 		elif length == 0:
-			self.base = 0
-			self.count = 0
-			return
+			base = 0
+			count = 0
+			finished = True
 
-		if dot is None:
-			if self.dot is not None:
-				dot = self.dot
+		try_base = False
+		bases = self.bases[:-1]
+		if base is not None:
+			bases = [base] + bases
+			try_base = True
+
+		try_count = False
+		if count is not None:
+			try_count = True
+
+		try_dot = False
+		dots = [False, True]
+		if dot is not None:
+			try_dot = True
+			if dot:
+				dots = dots[::-1]
+
+		if try_count and not try_base and not finished:
+			for dot in dots:
+				base = count / length
+				if isclose(base % 1, 0):
+					base = round(base)
+					if base in self.bases:
+						finished = True
+						if try_dot and (dot != dots[0]):
+							print(f"Warning:  Unable to set duration length {length} with dot {dot}.")
+						break
+			else:
+				print(f"Warning:  Unable to set duration length {length} with count {count}.")
+
+		if try_dot and not try_base and not finished:
+			dot_first_pass = True
+			for dot in dots:
+				for base in bases:
+					count = length * base / dotval[dot]
+					if isclose(count % 1, 0):
+						count = round(count)
+						finished = True
+						break
+				if finished:
+					break
+				elif dot_first_pass:
+					print(f"Warning:  Unable to set duration length {length} with dot {dot}.")
+				dot_first_pass = False
+
+		if not finished:
+			base_first_pass = True
+			for base in bases:
+				for dot in dots:
+					count = length * base / dotval[dot]
+					if isclose(count % 1, 0):
+						count = round(count)
+						finished = True
+						break
+				if finished:
+					break
+				if try_base and base_first_pass and not finished:
+					print(f"Warning:  Unable to set duration length {length} with base {base}.")
+				base_first_pass = False
 			else:
 				dot = False
-
-		if count is None:
-			if self.count is not None:
-				count = self.count
-			else:
-				count = 1
-
-		if base is None:
-			if self.base is not None:
-				base = self.base
-			else:
-				base = 1
-
-		if dot:
-			dotval = 1.5
-		else:
-			dotval = 1.0
-
-		if length != dotval * count / base:
-			dot = False
-			for testbase in self.bases[:-1]:
-				testcount = length * testbase
-				testcount_dot = testcount / 1.5
-				base = testbase
-				if isclose(testcount % 1, 0):
-					count = round(testcount)
-					break
-				elif isclose(testcount_dot % 1, 0):
-					count = round(testcount_dot)
-					dot = True
-					break
-				elif testbase == self.bases[-2]:
-					count = round(testcount)
-					print(f"Warning:  Rounding Duration to nearest {self.bases[-2]}th note.")
+				count = round(count)
+				print(f"Warning:  Rounding Duration to nearest {bases[-1]}th note.")
+			if try_dot and (dot != dots[0]):
+				print(f"Warning:  Unable to set duration length {length} with dot {dot}.")
 
 		self.base = base
 		self.count = count
