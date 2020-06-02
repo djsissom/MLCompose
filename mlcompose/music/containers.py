@@ -869,7 +869,7 @@ class Duration(util.CheckArg):
 
 	def set_base(self, base):
 		if (base not in self.bases) and (base is not None):
-			raise AttributeError(f"Attempted to set base {base}.  Duration base must be a power of 2 between 1 and 64.")
+			raise AttributeError(f"Attempted to set base {base}.  Duration base must be a power of 2 between 1 and {self.bases[-2]}.")
 		self._base = base
 		return
 
@@ -911,10 +911,10 @@ class Duration(util.CheckArg):
 	dot = property(get_dot, set_dot)
 
 
-	# TODO:  Update Duration operators to be better at returning Duration instances.
 	def __add__(self, other):
 		if isinstance(other, self.__class__):
-			result = self.length + other.length
+			newlength=self.length + other.length
+			result = Duration(length=newlength)
 		else:
 			result = self.length + other
 		return result
@@ -926,7 +926,8 @@ class Duration(util.CheckArg):
 
 	def __sub__(self, other):
 		if isinstance(other, self.__class__):
-			result = self.length - other.length
+			newlength = self.length - other.length
+			result = Duration(length=newlength)
 		else:
 			result = self.length - other
 		return result
@@ -934,7 +935,8 @@ class Duration(util.CheckArg):
 
 	def __rsub__(self, other):
 		if isinstance(other, self.__class__):
-			result = other.length - self.length
+			newlength = other.length - self.length
+			result = Duration(length=newlength)
 		else:
 			result = other - self.length
 		return result
@@ -945,7 +947,8 @@ class Duration(util.CheckArg):
 			result = self.length * other.length
 		else:
 			try:
-				result = Duration(self.base / other, dot=self.dot)
+				newlength = self.length * other
+				result = Duration(length=newlength)
 			except AttributeError:
 				result = self.length * other
 		return result
@@ -960,7 +963,8 @@ class Duration(util.CheckArg):
 			result = self.length / other.length
 		else:
 			try:
-				result = Duration(self.base * other, dot=self.dot)
+				newlength = self.length / other
+				result = Duration(length=newlength)
 			except AttributeError:
 				result = self.length / other
 		return result
