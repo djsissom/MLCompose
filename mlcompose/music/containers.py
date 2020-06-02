@@ -249,11 +249,9 @@ class Measure():
 		remaining_durations = list(set(remaining_durations))
 		remaining_durations.sort(reverse=True)
 
-		# TODO:  Fix this...
 		previous_remaining_duration = remaining_durations[0] + offset
 		for remaining_duration in remaining_durations:
 			beat = self.append_beat(offset=offset)
-			# TODO:  This needs to recurse to add multiple beats/notes if Duration isn't expanded.
 			beat.add_note(Rest(remaining_duration))
 			offset = previous_remaining_duration - remaining_duration
 			previous_remaining_duration = remaining_duration
@@ -695,6 +693,7 @@ class Duration(util.CheckArg):
 	'''
 	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False):
 		# TODO:  Decide how to handle triplets/tuples.
+		# TODO:  Pluralize half correctly for counts > 1 (probably not worth it).
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
 		self.base = None
@@ -734,9 +733,16 @@ class Duration(util.CheckArg):
 
 
 	def set_name(self, name):
-		# TODO:  Parse initial number in name string to set count.
 		if type(name) is not str:
 			raise AttributeError("Duration class 'name' attribute must be a string.")
+		try:
+			splitname = name.split(' ', maxsplit=1)
+			self.count = int(splitname[0])
+			name = splitname[1]
+			if name[-1] == 's':
+				name = name[:-1]
+		except ValueError:
+			pass
 		if name[:6].lower() == 'dotted':
 			self.dot = True
 			name = name[7:]
