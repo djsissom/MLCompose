@@ -249,11 +249,9 @@ class Measure():
 		remaining_durations = list(set(remaining_durations))
 		remaining_durations.sort(reverse=True)
 
-		# TODO:  Fix this...
 		previous_remaining_duration = remaining_durations[0] + offset
 		for remaining_duration in remaining_durations:
 			beat = self.append_beat(offset=offset)
-			# TODO:  This needs to recurse to add multiple beats/notes if Duration isn't expanded.
 			beat.add_note(Rest(remaining_duration))
 			offset = previous_remaining_duration - remaining_duration
 			previous_remaining_duration = remaining_duration
@@ -694,7 +692,8 @@ class Duration(util.CheckArg):
 		eighths).
 	'''
 	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False):
-		# TODO:  Decide how to handle triplets.
+		# TODO:  Decide how to handle triplets/tuples.
+		# TODO:  Pluralize half correctly for counts > 1 (probably not worth it).
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
 		self.base = None
@@ -718,22 +717,32 @@ class Duration(util.CheckArg):
 			elif (base is None) and (duration >= 1):
 				base = duration
 
+		if base is not None:
+			if mode == 'inverse_power':
+				base = 2**base
+			elif mode != 'inverse':
+				raise AttributeError("Duration class mode options are 'inverse' and 'inverse_power'.")
+
 		if name is not None:
 			self.name = name
 		elif length is not None:
-			self.set_length(length, base=base)
-		elif mode == 'inverse':
-			self.base = base
-		elif mode == 'inverse_power':
-			self.base = 2**base
+			self.set_length(length, base=base, count=count)
 		else:
-			raise AttributeError("Duration class mode options are 'inverse' and 'inverse_power'.")
+			self.base = base
 		return self
 
 
 	def set_name(self, name):
 		if type(name) is not str:
 			raise AttributeError("Duration class 'name' attribute must be a string.")
+		try:
+			splitname = name.split(' ', maxsplit=1)
+			self.count = int(splitname[0])
+			name = splitname[1]
+			if name[-1] == 's':
+				name = name[:-1]
+		except ValueError:
+			pass
 		if name[:6].lower() == 'dotted':
 			self.dot = True
 			name = name[7:]
@@ -747,20 +756,126 @@ class Duration(util.CheckArg):
 
 	def get_name(self):
 		list_index = self.bases.index(self.base)
-		basename = self.names[list_index]
+		name = self.names[list_index]
 		if self.dot:
-			name = 'dotted ' + basename
-		else:
-			name = basename
+			name = 'dotted ' + name
+		if (self.count != 0) and (self.count != 1):
+			name = f"{self.count} {name}s"
 		return name
 
 
 	name = property(get_name, set_name)
 
 
+	def set_length(self, length, base=None, count=None, dot=None):
+		finished = False
+		dotval = {False: 1.0, True: 1.5}
+		if count == 1:
+			count = None
+		if length is None:
+			count = None
+			finished = True
+		elif length == 0:
+			base = 0
+			count = 0
+			finished = True
+		elif (length == self.length) and (base is None) and (count is None) and (dot is None):
+			base = self.base
+			count = self.count
+			dot = self.dot
+			finished = True
+
+		try_base = False
+		bases = self.bases[:-1]
+		if base is not None:
+			bases = [base] + bases
+			try_base = True
+
+		try_count = False
+		if count is not None:
+			try_count = True
+
+		try_dot = False
+		dots = [False, True]
+		if dot is not None:
+			try_dot = True
+			if dot:
+				dots = dots[::-1]
+
+		if try_count and not try_base and not finished:
+			for dot in dots:
+				base = count / length
+				if isclose(base % 1, 0):
+					base = round(base)
+					if base in self.bases:
+						finished = True
+						if try_dot and (dot != dots[0]):
+							print(f"Warning:  Unable to set duration length {length} with dot {dot}.")
+						break
+			else:
+				print(f"Warning:  Unable to set duration length {length} with count {count}.")
+
+		if try_dot and not try_base and not finished:
+			dot_first_pass = True
+			for dot in dots:
+				for base in bases:
+					count = length * base / dotval[dot]
+					if isclose(count % 1, 0):
+						count = round(count)
+						finished = True
+						break
+				if finished:
+					break
+				elif dot_first_pass:
+					print(f"Warning:  Unable to set duration length {length} with dot {dot}.")
+				dot_first_pass = False
+
+		if not finished:
+			base_first_pass = True
+			for base in bases:
+				for dot in dots:
+					count = length * base / dotval[dot]
+					if isclose(count % 1, 0):
+						count = round(count)
+						finished = True
+						break
+				if finished:
+					break
+				if try_base and base_first_pass and not finished:
+					print(f"Warning:  Unable to set duration length {length} with base {base}.")
+				base_first_pass = False
+			else:
+				dot = False
+				count = round(count)
+				print(f"Warning:  Rounding Duration to nearest {bases[-1]}th note.")
+			if try_dot and (dot != dots[0]):
+				print(f"Warning:  Unable to set duration length {length} with dot {dot}.")
+
+		self.base = base
+		self.count = count
+		self.dot = dot
+		return
+
+
+	def get_length(self):
+		if self.base is None:
+			length = None
+		else:
+			if self.base == 0:
+				length = 0
+			else:
+				length = self.count / self.base
+			if self.dot:
+				length = length * 1.5
+		return length
+
+
+	length = property(get_length, set_length)
+
+
 	def set_base(self, base):
 		if (base not in self.bases) and (base is not None):
-			raise AttributeError(f"Attempted to set base {base}.  Duration base must be a power of 2 between 1 and 64.")
+			raise AttributeError(f"Attempted to set base {base}.  Duration base must be a power of 2 between 1 and {self.bases[-2]}.")
 		self._base = base
 		return
 
@@ -802,68 +917,10 @@ class Duration(util.CheckArg):
 	dot = property(get_dot, set_dot)
 
 
-	def set_length(self, length, base=None, count=None, dot=None):
-		if length is None:
-			self.count = None
-		elif length == 0:
-			self.base = 0
-			self.count = 0
-		elif self.length != length:
-			if dot is None:
-				if self.dot is not None:
-					dot = self.dot
-				else:
-					dot = False
-
-			if count is None:
-				if self.count is not None:
-					count = self.count
-				else:
-					count = 1
-
-			if base is None:
-				if self.base is not None:
-					base = self.base
-				else:
-					base = 1
-
-			if length != dot * count / base:
-				for testbase in self.bases[:-1]:
-					# TODO:  Try with and without dot.
-					testcount = length * testbase
-					count = round(testcount)
-					base = testbase
-					if isclose(testcount % 1, 0):
-						break
-					if testbase == self.bases[-2]:
-						print(f"Warning:  Rounding Duration to nearest {self.bases[-2]}th note.")
-
-			self.base = base
-			self.count = count
-			self.dot = dot
-		return
-
-
-	def get_length(self):
-		if self.base is None:
-			length = None
-		else:
-			if self.base == 0:
-				length = 0
-			else:
-				length = self.count / self.base
-			if self.dot:
-				length = length * 1.5
-		return length
-
-
-	length = property(get_length, set_length)
-
-
-	# TODO:  Update Duration operators to be better at returning Duration instances.
 	def __add__(self, other):
 		if isinstance(other, self.__class__):
-			result = self.length + other.length
+			newlength=self.length + other.length
+			result = Duration(length=newlength)
 		else:
 			result = self.length + other
 		return result
@@ -875,7 +932,8 @@ class Duration(util.CheckArg):
 
 	def __sub__(self, other):
 		if isinstance(other, self.__class__):
-			result = self.length - other.length
+			newlength = self.length - other.length
+			result = Duration(length=newlength)
 		else:
 			result = self.length - other
 		return result
@@ -883,7 +941,8 @@ class Duration(util.CheckArg):
 
 	def __rsub__(self, other):
 		if isinstance(other, self.__class__):
-			result = other.length - self.length
+			newlength = other.length - self.length
+			result = Duration(length=newlength)
 		else:
 			result = other - self.length
 		return result
@@ -894,7 +953,8 @@ class Duration(util.CheckArg):
 			result = self.length * other.length
 		else:
 			try:
-				result = Duration(self.base / other, dot=self.dot)
+				newlength = self.length * other
+				result = Duration(length=newlength)
 			except AttributeError:
 				result = self.length * other
 		return result
@@ -909,7 +969,8 @@ class Duration(util.CheckArg):
 			result = self.length / other.length
 		else:
 			try:
-				result = Duration(self.base * other, dot=self.dot)
+				newlength = self.length / other
+				result = Duration(length=newlength)
 			except AttributeError:
 				result = self.length / other
 		return result
