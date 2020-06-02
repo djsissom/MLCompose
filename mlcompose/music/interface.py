@@ -3,7 +3,6 @@
 import sys
 import numpy as np
 import pandas as pd
-from ipdb import set_trace
 
 from . import containers
 from .. import util
@@ -24,6 +23,7 @@ def main():
 
 
 class Composer():
+	# TODO:  Add Composer docstring.
 	def __init__(self, song=None):
 		# set default song to work on
 		self.song = song
@@ -149,8 +149,19 @@ class Composer():
 	song = property(get_song, set_song)
 
 
-	def update(self, song=None):
+	def update(self, song=None, sync_measures=True):
+		'''
+		Update the song using the currently set control nodes.
+
+		This driver method should be called after updating the nodes attribute
+		of the Composer.  The update method reads the currently activated
+		control nodes and adds to/modifies the song accordingly.  The
+		sync_measures option forces all tracks to compose the same measure
+		simultaneously when True or allows composing each track independently
+		when False.
+		'''
 		song = self.get_song(song)
+		measure, beat = update_position(song, sync_measures)
 
 		mode_list = np.array([
 			self.endsong_node,
@@ -165,16 +176,38 @@ class Composer():
 			self.set_control_signal
 		]
 		mode_function = mode_functions[max_mode_index]
-		return mode_function(song)
+		return mode_function(song, measure, beat)
 
 
-	def end_song(self, song=None):
+	def update_position(self, song=None, sync_measures=True):
+		'''Find the latest unfinished measure and beat for each track.'''
+		song = self.get_song(song)
+		active_track = self.hand_nodes.argmax()
+		pad = (sync_measures and track[active_track].measures[-1].complete)
+
+		for track in song.tracks:
+			last_measure = track.measures[-1]
+			if pad and not last_measure.complete:
+					last_measure.pad_rests()
+			if last_measure.complete:
+				last_measure = track.append_measure(key=song.key, time_signature=song.time_signature)
+
+			last_beat = last_measure.beats[-1]
+			if last_beat.complete:
+				last_beat = last_measure.append_beat()
+
+		measure = track[active_track].measures[-1]
+		beat = measure.beats[-1]
+		return measure, beat
+
+
+	def end_song(self, song=None, measure=None, beat=None):
 		song = self.get_song(song)
 		song.end_song()
 		return
 
 
-	def make_note(self, song=None, key=None):
+	def make_note(self, song=None, measure=None, beat=None):
 		song = self.get_song(song)
 
 		# TODO:  This should depend on whether it's a real rest or ending a chord.
@@ -182,6 +215,7 @@ class Composer():
 			self.set_rest()
 			return
 
+		# TODO:  This should get key from current measure.
 		if key is None:
 			key = song.key
 
@@ -210,13 +244,13 @@ class Composer():
 		return
 
 
-	def set_rest(self, song=None):
+	def set_rest(self, song=None, measure=None, beat=None):
 		song = self.get_song(song)
 		# TODO:  actually do something here
 		return
 
 
-	def set_control_signal(self, song=None):
+	def set_control_signal(self, song=None, measure=None, beat=None):
 		song = self.get_song(song)
 		# TODO:  actually do something here
 		return
