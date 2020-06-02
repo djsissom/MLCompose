@@ -753,7 +753,7 @@ class Duration(util.CheckArg):
 		name = self.names[list_index]
 		if self.dot:
 			name = 'dotted ' + name
-		if self.count != 1:
+		if (self.count != 0) and (self.count != 1):
 			name = f"{self.count} {name}s"
 		return name
 
