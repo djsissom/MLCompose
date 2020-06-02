@@ -733,6 +733,7 @@ class Duration(util.CheckArg):
 
 
 	def set_name(self, name):
+		# TODO:  Parse initial number in name string to set count.
 		if type(name) is not str:
 			raise AttributeError("Duration class 'name' attribute must be a string.")
 		if name[:6].lower() == 'dotted':
@@ -748,11 +749,11 @@ class Duration(util.CheckArg):
 
 	def get_name(self):
 		list_index = self.bases.index(self.base)
-		basename = self.names[list_index]
+		name = self.names[list_index]
 		if self.dot:
-			name = 'dotted ' + basename
-		else:
-			name = basename
+			name = 'dotted ' + name
+		if self.count != 1:
+			name = f"{self.count} {name}s"
 		return name
 
 
