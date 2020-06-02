@@ -766,17 +766,17 @@ class Duration(util.CheckArg):
 		dotval = {False: 1.0, True: 1.5}
 		if count == 1:
 			count = None
-		if (length == self.length) and (base is None) and (count is None) and (dot is None):
-			base = self.base
-			count = self.count
-			dot = self.dot
-			finished = True
-		elif length is None:
+		if length is None:
 			count = None
 			finished = True
 		elif length == 0:
 			base = 0
 			count = 0
+			finished = True
+		elif (length == self.length) and (base is None) and (count is None) and (dot is None):
+			base = self.base
+			count = self.count
+			dot = self.dot
 			finished = True
 
 		try_base = False
