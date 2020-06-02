@@ -694,7 +694,7 @@ class Duration(util.CheckArg):
 		eighths).
 	'''
 	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False):
-		# TODO:  Decide how to handle triplets.
+		# TODO:  Decide how to handle triplets/tuples.
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
 		self.base = None
@@ -718,17 +718,18 @@ class Duration(util.CheckArg):
 			elif (base is None) and (duration >= 1):
 				base = duration
 
-		# TODO:  Move Duration mode check to before setting length or base.
+		if base is not None:
+			if mode == 'inverse_power':
+				base = 2**base
+			elif mode != 'inverse':
+				raise AttributeError("Duration class mode options are 'inverse' and 'inverse_power'.")
+
 		if name is not None:
 			self.name = name
 		elif length is not None:
 			self.set_length(length, base=base, count=count)
-		elif mode == 'inverse':
-			self.base = base
-		elif mode == 'inverse_power':
-			self.base = 2**base
 		else:
-			raise AttributeError("Duration class mode options are 'inverse' and 'inverse_power'.")
+			self.base = base
 		return self
 
 
