@@ -250,8 +250,9 @@ class Measure():
 
 		previous_remaining_duration = remaining_durations[0] + offset
 		for remaining_duration in remaining_durations:
-			beat = self.append_beat(offset=offset)
-			beat.add_note(Rest(remaining_duration))
+			if remaining_duration != 0:
+				beat = self.append_beat(offset=offset)
+				beat.add_note(Rest(remaining_duration))
 			offset = previous_remaining_duration - remaining_duration
 			previous_remaining_duration = remaining_duration
 
