@@ -180,8 +180,8 @@ class Measure():
 		complete = self._complete
 		last_beat = self.beats[-1]
 		if not complete and last_beat.complete and self.remaining_duration == 0:
-				complete = True
-				self.complete = complete
+			complete = True
+			self.complete = complete
 		return complete
 
 
@@ -232,7 +232,6 @@ class Measure():
 
 
 	def pad_rests(self):
-		# TODO:  This needs an extensive unit test.
 		last_beat = self.beats[-1]
 		if last_beat.notes == []:
 			remaining_durations = [self.get_remaining_duration(beat=last_beat)]
