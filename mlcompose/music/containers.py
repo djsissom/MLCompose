@@ -690,8 +690,10 @@ class Duration(util.CheckArg):
 		Specify whether the duration should be dotted.  If True, the base
 		duration is multiplied by 1.5 (e.g., a dotted quarter is three
 		eighths).
+	tuplet : False or int (optional)
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	'''
-	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False):
+	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False, tuplet=False):
 		# TODO:  Decide how to handle triplets/tuples.
 		# TODO:  Pluralize half correctly for counts > 1 (probably not worth it).
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
@@ -699,15 +701,17 @@ class Duration(util.CheckArg):
 		self.base = None
 		self.count = None
 		self.dot = None
+		self.tuplet = None
 		if (duration is not None) or (name is not None) or (length is not None) or (base is not None):
-			self.set(duration, name, length, count, base, mode, dot)
+			self.set(duration, name, length, count, base, mode, dot, tuplet)
 
 
-	def set(self, duration=None, name=None, length=None, count=1, base=None, mode='inverse', dot=False):
+	def set(self, duration=None, name=None, length=None, count=1, base=None, mode='inverse', dot=False, tuplet=False):
 		if (duration is None) and (name is None) and (length is None) and (base is None):
 			raise AttributeError("Setting a Duration requires setting at least one parameter.")
 		self.count = count
 		self.dot = dot
+		self.tuplet = tuplet
 
 		if duration is not None:
 			if (name is None) and (type(duration) == str):
@@ -915,6 +919,19 @@ class Duration(util.CheckArg):
 
 
 	dot = property(get_dot, set_dot)
+
+
+	def set_tuplet(self, tuplet):
+		self._tuplet = tuplet
+		return
+
+
+	def get_tuplet(self):
+		tuplet = self._tuplet
+		return tuplet
+
+
+	tuplet = property(get_tuplet, set_tuplet)
 
 
 	def __add__(self, other):
