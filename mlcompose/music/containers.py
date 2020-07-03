@@ -637,7 +637,7 @@ class Event():
 
 class Duration(util.CheckArg):
 	'''
-	Duration(duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False)
+	Duration(duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False, tuplet=False)
 
 	Create a Duration object.  If no parameters are given, creates an
 	uninitialized instance.  Can be (re-)initialized with the set() method with
@@ -922,6 +922,15 @@ class Duration(util.CheckArg):
 
 
 	def set_tuplet(self, tuplet):
+		if (tuplet is not None) and (tuplet is not False) and (type(tuplet) is not int) and (type(tuplet) is not float):
+			raise AttributeError("Duration class tuplet attribute must be None, False, or an integer.")
+		if type(tuplet) is float:
+			print("Warning:  Casting Duration tuplet argument to integer.")
+			tuplet = int(tuplet)
+		if (type(tuplet) is int) and (tuplet < 0):
+			raise AttributeError("Negative tuplet values not supported.")
+		if (tuplet == 0) or (tuplet == 1):
+			tuplet = False
 		self._tuplet = tuplet
 		return
 
