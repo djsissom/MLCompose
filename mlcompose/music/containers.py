@@ -702,6 +702,7 @@ class Duration(util.CheckArg):
 		self.count = None
 		self.dot = None
 		self.tuplet = None
+		self.tuplet_names = ['duplet', 'triplet', 'quadruplet', 'quintuplet', 'sextuplet', 'septuplet', 'octuplet']
 		if (duration is not None) or (name is not None) or (length is not None) or (base is not None):
 			self.set(duration, name, length, count, base, mode, dot, tuplet)
 
@@ -760,11 +761,15 @@ class Duration(util.CheckArg):
 
 
 	def get_name(self):
-		# TODO:  Print tuplet in Duration string if applicable.
 		list_index = self.bases.index(self.base)
 		name = self.names[list_index]
 		if self.dot:
 			name = 'dotted ' + name
+		if self.tuplet:
+			if self.tuplet < len(self.tuplet_names) + 2:
+				name = self.tuplet_names[self.tuplet - 2] + ' ' + name
+			else:
+				name = f"{self.tuplet}-tuplet {name}"
 		if (self.count != 0) and (self.count != 1):
 			name = f"{self.count} {name}s"
 		return name
