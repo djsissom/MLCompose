@@ -637,7 +637,7 @@ class Event():
 
 class Duration(util.CheckArg):
 	'''
-	Duration(duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False)
+	Duration(duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False, tuplet=False)
 
 	Create a Duration object.  If no parameters are given, creates an
 	uninitialized instance.  Can be (re-)initialized with the set() method with
@@ -690,8 +690,10 @@ class Duration(util.CheckArg):
 		Specify whether the duration should be dotted.  If True, the base
 		duration is multiplied by 1.5 (e.g., a dotted quarter is three
 		eighths).
+	tuplet : False or int (optional)
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	'''
-	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False):
+	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False, tuplet=False):
 		# TODO:  Decide how to handle triplets/tuples.
 		# TODO:  Pluralize half correctly for counts > 1 (probably not worth it).
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
@@ -699,15 +701,18 @@ class Duration(util.CheckArg):
 		self.base = None
 		self.count = None
 		self.dot = None
+		self.tuplet = None
+		self.tuplet_names = ['duplet', 'triplet', 'quadruplet', 'quintuplet', 'sextuplet', 'septuplet', 'octuplet']
 		if (duration is not None) or (name is not None) or (length is not None) or (base is not None):
-			self.set(duration, name, length, count, base, mode, dot)
+			self.set(duration, name, length, count, base, mode, dot, tuplet)
 
 
-	def set(self, duration=None, name=None, length=None, count=1, base=None, mode='inverse', dot=False):
+	def set(self, duration=None, name=None, length=None, count=1, base=None, mode='inverse', dot=False, tuplet=False):
 		if (duration is None) and (name is None) and (length is None) and (base is None):
 			raise AttributeError("Setting a Duration requires setting at least one parameter.")
 		self.count = count
 		self.dot = dot
+		self.tuplet = tuplet
 
 		if duration is not None:
 			if (name is None) and (type(duration) == str):
@@ -746,6 +751,13 @@ class Duration(util.CheckArg):
 		if name[:6].lower() == 'dotted':
 			self.dot = True
 			name = name[7:]
+		for testlength in range(len(min(self.tuplet_names, key=len)), len(max(self.tuplet_names, key=len))+1):
+			try:
+				self.tuplet = name[:testlength]
+				name = name[testlength+1:]
+				break
+			except AttributeError:
+				pass
 		if name.lower() in self.names:
 			list_index = self.names.index(name.lower())
 			self.base = self.bases[list_index]
@@ -759,6 +771,11 @@ class Duration(util.CheckArg):
 		name = self.names[list_index]
 		if self.dot:
 			name = 'dotted ' + name
+		if self.tuplet:
+			if self.tuplet < len(self.tuplet_names) + 2:
+				name = self.tuplet_names[self.tuplet - 2] + ' ' + name
+			else:
+				name = f"{self.tuplet}-tuplet {name}"
 		if (self.count != 0) and (self.count != 1):
 			name = f"{self.count} {name}s"
 		return name
@@ -768,6 +785,7 @@ class Duration(util.CheckArg):
 
 
 	def set_length(self, length, base=None, count=None, dot=None):
+		# TODO:  Allow setting Duration length with tuplets.
 		finished = False
 		dotval = {False: 1.0, True: 1.5}
 		if count == 1:
@@ -859,14 +877,25 @@ class Duration(util.CheckArg):
 
 	def get_length(self):
 		if self.base is None:
-			length = None
-		else:
-			if self.base == 0:
-				length = 0
+			return None
+		elif self.base == 0:
+			return 0
+
+		length = self.count / self.base
+
+		if self.dot:
+			length = length * 1.5
+
+		if self.tuplet and self.tuplet % 2 == 0:
+			length = length * 3 / self.tuplet
+		elif self.tuplet:
+			for base, nextbase in zip(self.bases[:-1], self.bases[1:]):
+				if (self.tuplet > base) and (self.tuplet < nextbase):
+					tuplet_base = base
+					break
 			else:
-				length = self.count / self.base
-			if self.dot:
-				length = length * 1.5
+				raise AttributeError(f"Unable to find suitable tuplet base < {self.bases[-2]}.")
+			length = length * tuplet_base / self.tuplet
 		return length
 
 
@@ -915,6 +944,34 @@ class Duration(util.CheckArg):
 
 
 	dot = property(get_dot, set_dot)
+
+
+	def set_tuplet(self, tuplet):
+		if (tuplet is not None) and (tuplet is not False) and (type(tuplet) is not int) and (type(tuplet) is not float) and (type(tuplet) is not str):
+			raise AttributeError("Duration class tuplet attribute must be None, False, an integer, or a string.")
+		if type(tuplet) is str:
+			if tuplet.lower() in self.tuplet_names:
+				list_index = self.tuplet_names.index(tuplet.lower())
+				tuplet = list_index + 2
+			else:
+				raise AttributeError(f"Allowed Duration tuplet names are:\n    {self.tuplet_names}")
+		if type(tuplet) is float:
+			print("Warning:  Casting Duration tuplet argument to integer.")
+			tuplet = int(tuplet)
+		if (type(tuplet) is int) and (tuplet < 0):
+			raise AttributeError("Negative tuplet values not supported.")
+		if (tuplet == 0) or (tuplet == 1):
+			tuplet = False
+		self._tuplet = tuplet
+		return
+
+
+	def get_tuplet(self):
+		tuplet = self._tuplet
+		return tuplet
+
+
+	tuplet = property(get_tuplet, set_tuplet)
 
 
 	def __add__(self, other):
