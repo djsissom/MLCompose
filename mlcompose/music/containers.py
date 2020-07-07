@@ -876,8 +876,7 @@ class Duration(util.CheckArg):
 			length = length * 1.5
 
 		if self.tuplet and self.tuplet % 2 == 0:
-			# TODO:  Implement duplets, etc.
-			raise AttributeError("Mixed meter tuplets currently unsupported.")
+			length = length * 3 / self.tuplet
 		elif self.tuplet:
 			for base, nextbase in zip(self.bases[:-1], self.bases[1:]):
 				if (self.tuplet > base) and (self.tuplet < nextbase):
