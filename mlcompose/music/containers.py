@@ -737,6 +737,7 @@ class Duration(util.CheckArg):
 
 
 	def set_name(self, name):
+		# TODO:  Accept setting Duration with tuplet in name string.
 		if type(name) is not str:
 			raise AttributeError("Duration class 'name' attribute must be a string.")
 		try:
@@ -759,6 +760,7 @@ class Duration(util.CheckArg):
 
 
 	def get_name(self):
+		# TODO:  Print tuplet in Duration string if applicable.
 		list_index = self.bases.index(self.base)
 		name = self.names[list_index]
 		if self.dot:
@@ -772,6 +774,7 @@ class Duration(util.CheckArg):
 
 
 	def set_length(self, length, base=None, count=None, dot=None):
+		# TODO:  Allow setting Duration length with tuplets.
 		finished = False
 		dotval = {False: 1.0, True: 1.5}
 		if count == 1:
@@ -863,14 +866,26 @@ class Duration(util.CheckArg):
 
 	def get_length(self):
 		if self.base is None:
-			length = None
-		else:
-			if self.base == 0:
-				length = 0
+			return None
+		elif self.base == 0:
+			return 0
+
+		length = self.count / self.base
+
+		if self.dot:
+			length = length * 1.5
+
+		if self.tuplet and self.tuplet % 2 == 0:
+			# TODO:  Implement duplets, etc.
+			raise AttributeError("Mixed meter tuplets currently unsupported.")
+		elif self.tuplet:
+			for base, nextbase in zip(self.bases[:-1], self.bases[1:]):
+				if (self.tuplet > base) and (self.tuplet < nextbase):
+					tuplet_base = base
+					break
 			else:
-				length = self.count / self.base
-			if self.dot:
-				length = length * 1.5
+				raise AttributeError(f"Unable to find suitable tuplet base < {self.bases[-2]}.")
+			length = length * tuplet_base / self.tuplet
 		return length
 
 
