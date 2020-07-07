@@ -738,7 +738,6 @@ class Duration(util.CheckArg):
 
 
 	def set_name(self, name):
-		# TODO:  Accept setting Duration with tuplet in name string.
 		if type(name) is not str:
 			raise AttributeError("Duration class 'name' attribute must be a string.")
 		try:
@@ -752,6 +751,13 @@ class Duration(util.CheckArg):
 		if name[:6].lower() == 'dotted':
 			self.dot = True
 			name = name[7:]
+		for testlength in range(len(min(self.tuplet_names, key=len)), len(max(self.tuplet_names, key=len))+1):
+			try:
+				self.tuplet = name[:testlength]
+				name = name[testlength+1:]
+				break
+			except AttributeError:
+				pass
 		if name.lower() in self.names:
 			list_index = self.names.index(name.lower())
 			self.base = self.bases[list_index]
@@ -941,8 +947,14 @@ class Duration(util.CheckArg):
 
 
 	def set_tuplet(self, tuplet):
-		if (tuplet is not None) and (tuplet is not False) and (type(tuplet) is not int) and (type(tuplet) is not float):
-			raise AttributeError("Duration class tuplet attribute must be None, False, or an integer.")
+		if (tuplet is not None) and (tuplet is not False) and (type(tuplet) is not int) and (type(tuplet) is not float) and (type(tuplet) is not str):
+			raise AttributeError("Duration class tuplet attribute must be None, False, an integer, or a string.")
+		if type(tuplet) is str:
+			if tuplet.lower() in self.tuplet_names:
+				list_index = self.tuplet_names.index(tuplet.lower())
+				tuplet = list_index + 2
+			else:
+				raise AttributeError(f"Allowed Duration tuplet names are:\n    {self.tuplet_names}")
 		if type(tuplet) is float:
 			print("Warning:  Casting Duration tuplet argument to integer.")
 			tuplet = int(tuplet)
