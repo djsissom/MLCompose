@@ -71,9 +71,45 @@ class TestDurationTuplets(unittest.TestCase):
 		return
 
 
-	def test_duplet_name(self):
+	def test_triplets(self):
+		d = mus.Duration('eighth', tuplet=3)
+		self.assertAlmostEqual(d.length, (1/8)*(2/3))
+		return
+
+
+	def test_quadruplets(self):
+		d = mus.Duration('eighth', tuplet=4)
+		self.assertAlmostEqual(d.length, (1/8)*(3/4))
+		return
+
+
+	def test_quintuplets(self):
+		d = mus.Duration('eighth', tuplet=5)
+		self.assertAlmostEqual(d.length, (1/8)*(4/5))
+		return
+
+
+	def test_duplet_names(self):
 		d = mus.Duration('eighth', tuplet=2)
 		self.assertEqual(d.name, 'duplet eighth')
+		return
+
+
+	def test_triplet_names(self):
+		d = mus.Duration('eighth', tuplet=3)
+		self.assertEqual(d.name, 'triplet eighth')
+		return
+
+
+	def test_quadruplet_names(self):
+		d = mus.Duration('eighth', tuplet=4)
+		self.assertEqual(d.name, 'quadruplet eighth')
+		return
+
+
+	def test_quintuplet_names(self):
+		d = mus.Duration('eighth', tuplet=5)
+		self.assertEqual(d.name, 'quintuplet eighth')
 		return
 
 
@@ -86,18 +122,6 @@ class TestDurationTuplets(unittest.TestCase):
 		return
 
 
-	def test_triplets(self):
-		d = mus.Duration('eighth', tuplet=3)
-		self.assertAlmostEqual(d.length, (1/8)*(2/3))
-		return
-
-
-	def test_triplet_name(self):
-		d = mus.Duration('eighth', tuplet=3)
-		self.assertEqual(d.name, 'triplet eighth')
-		return
-
-
 	def test_triplet_setting_by_names(self):
 		d = mus.Duration('eighth', tuplet='triplet')
 		self.assertAlmostEqual(d.length, (1/8)*(2/3))
@@ -107,36 +131,12 @@ class TestDurationTuplets(unittest.TestCase):
 		return
 
 
-	def test_quadruplets(self):
-		d = mus.Duration('eighth', tuplet=4)
-		self.assertAlmostEqual(d.length, (1/8)*(3/4))
-		return
-
-
-	def test_quadruplet_name(self):
-		d = mus.Duration('eighth', tuplet=4)
-		self.assertEqual(d.name, 'quadruplet eighth')
-		return
-
-
 	def test_quadruplet_setting_by_names(self):
 		d = mus.Duration('eighth', tuplet='quadruplet')
 		self.assertAlmostEqual(d.length, (1/8)*(3/4))
 
 		d = mus.Duration('quadruplet eighth')
 		self.assertAlmostEqual(d.length, (1/8)*(3/4))
-		return
-
-
-	def test_quintuplets(self):
-		d = mus.Duration('eighth', tuplet=5)
-		self.assertAlmostEqual(d.length, (1/8)*(4/5))
-		return
-
-
-	def test_quintuplet_name(self):
-		d = mus.Duration('eighth', tuplet=5)
-		self.assertEqual(d.name, 'quintuplet eighth')
 		return
 
 
