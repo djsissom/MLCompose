@@ -784,7 +784,7 @@ class Duration(util.CheckArg):
 	name = property(get_name, set_name)
 
 
-	def set_length(self, length, base=None, count=None, dot=None):
+	def set_length(self, length, base=None, count=None, dot=None, tuplet=None):
 		# TODO:  Allow setting Duration length with tuplets.
 		finished = False
 		dotval = {False: 1.0, True: 1.5}
@@ -797,10 +797,11 @@ class Duration(util.CheckArg):
 			base = 0
 			count = 0
 			finished = True
-		elif (length == self.length) and (base is None) and (count is None) and (dot is None):
+		elif (length == self.length) and (base is None) and (count is None) and (dot is None) and (tuplet is None):
 			base = self.base
 			count = self.count
 			dot = self.dot
+			tuplet = self.tuplet
 			finished = True
 
 		try_base = False
@@ -820,7 +821,13 @@ class Duration(util.CheckArg):
 			if dot:
 				dots = dots[::-1]
 
-		if try_count and not try_base and not finished:
+		try_tuplet = False
+		if tuplet is None:
+			tuplet = self.tuplet
+		if tuplet:
+			try_tuplet = True
+
+		if not finished and try_count and not try_base:
 			for dot in dots:
 				base = count / length
 				if isclose(base % 1, 0):
@@ -833,7 +840,7 @@ class Duration(util.CheckArg):
 			else:
 				print(f"Warning:  Unable to set duration length {length} with count {count}.")
 
-		if try_dot and not try_base and not finished:
+		if not finished and try_dot and not try_base:
 			dot_first_pass = True
 			for dot in dots:
 				for base in bases:
@@ -853,6 +860,18 @@ class Duration(util.CheckArg):
 			for base in bases:
 				for dot in dots:
 					count = length * base / dotval[dot]
+					if try_tuplet:
+						# TODO:  Move tuplet_base calc to its own property/method.
+						if tuplet % 2 == 0:
+							tuplet_base = 3
+						else:
+							for base, nextbase in zip(self.bases[:-1], self.bases[1:]):
+								if (self.tuplet > base) and (self.tuplet < nextbase):
+									tuplet_base = base
+									break
+							else:
+								raise AttributeError(f"Unable to find suitable tuplet base < {self.bases[-2]}.")
+						count = count * tuplet / tuplet_base
 					if isclose(count % 1, 0):
 						count = round(count)
 						finished = True
@@ -872,6 +891,7 @@ class Duration(util.CheckArg):
 		self.base = base
 		self.count = count
 		self.dot = dot
+		self.tuplet = tuplet
 		return
 
 
@@ -886,6 +906,7 @@ class Duration(util.CheckArg):
 		if self.dot:
 			length = length * 1.5
 
+		# TODO:  Move tuplet_base calc to its own property/method.
 		if self.tuplet and self.tuplet % 2 == 0:
 			length = length * 3 / self.tuplet
 		elif self.tuplet:
