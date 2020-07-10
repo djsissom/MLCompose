@@ -637,7 +637,7 @@ class Event():
 
 class Duration(util.CheckArg):
 	'''
-	Duration(duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False, tuplet=False)
+	Duration(duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False, tuplet=False, tuplet_base=None)
 
 	Create a Duration object.  If no parameters are given, creates an
 	uninitialized instance.  Can be (re-)initialized with the set() method with
@@ -692,9 +692,12 @@ class Duration(util.CheckArg):
 		eighths).
 	tuplet : False or int (optional)
 		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	tuplet_base : None or int (optional)
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	'''
-	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False, tuplet=False):
+	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False, tuplet=False, tuplet_base=None):
 		# TODO:  Decide how to handle triplets/tuples.
+		# TODO:  Update docstring for tuplets.
 		# TODO:  Pluralize half correctly for counts > 1 (probably not worth it).
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
@@ -704,15 +707,16 @@ class Duration(util.CheckArg):
 		self.tuplet = None
 		self.tuplet_names = ['duplet', 'triplet', 'quadruplet', 'quintuplet', 'sextuplet', 'septuplet', 'octuplet']
 		if (duration is not None) or (name is not None) or (length is not None) or (base is not None):
-			self.set(duration, name, length, count, base, mode, dot, tuplet)
+			self.set(duration, name, length, count, base, mode, dot, tuplet, tuplet_base)
 
 
-	def set(self, duration=None, name=None, length=None, count=1, base=None, mode='inverse', dot=False, tuplet=False):
+	def set(self, duration=None, name=None, length=None, count=1, base=None, mode='inverse', dot=False, tuplet=False, tuplet_base=None):
 		if (duration is None) and (name is None) and (length is None) and (base is None):
 			raise AttributeError("Setting a Duration requires setting at least one parameter.")
 		self.count = count
 		self.dot = dot
 		self.tuplet = tuplet
+		self.tuplet_base = tuplet_base
 
 		if duration is not None:
 			if (name is None) and (type(duration) == str):
@@ -861,17 +865,7 @@ class Duration(util.CheckArg):
 				for dot in dots:
 					count = length * base / dotval[dot]
 					if try_tuplet:
-						# TODO:  Move tuplet_base calc to its own property/method.
-						if tuplet % 2 == 0:
-							tuplet_base = 3
-						else:
-							for base, nextbase in zip(self.bases[:-1], self.bases[1:]):
-								if (self.tuplet > base) and (self.tuplet < nextbase):
-									tuplet_base = base
-									break
-							else:
-								raise AttributeError(f"Unable to find suitable tuplet base < {self.bases[-2]}.")
-						count = count * tuplet / tuplet_base
+						count = count * tuplet / self.tuplet_base
 					if isclose(count % 1, 0):
 						count = round(count)
 						finished = True
@@ -906,17 +900,9 @@ class Duration(util.CheckArg):
 		if self.dot:
 			length = length * 1.5
 
-		# TODO:  Move tuplet_base calc to its own property/method.
-		if self.tuplet and self.tuplet % 2 == 0:
-			length = length * 3 / self.tuplet
-		elif self.tuplet:
-			for base, nextbase in zip(self.bases[:-1], self.bases[1:]):
-				if (self.tuplet > base) and (self.tuplet < nextbase):
-					tuplet_base = base
-					break
-			else:
-				raise AttributeError(f"Unable to find suitable tuplet base < {self.bases[-2]}.")
-			length = length * tuplet_base / self.tuplet
+		if self.tuplet:
+			length = length * self.tuplet_base / self.tuplet
+
 		return length
 
 
@@ -993,6 +979,35 @@ class Duration(util.CheckArg):
 
 
 	tuplet = property(get_tuplet, set_tuplet)
+
+
+	def set_tuplet_base(self, base):
+		if (base is not None) and (type(base) is not int) and (type(base) is not float):
+			raise AttributeError("Duration class tuplet_base attribute must be None or an integer.")
+		if (type(base) is float):
+			print("Warning:  Casting Duration tuplet_base argument to integer.")
+			base = int(base)
+		self._tuplet_base = base
+		return
+
+
+	def get_tuplet_base(self):
+		tuplet = self.tuplet
+		base = self._tuplet_base
+		if base is None:
+			if tuplet % 2 == 0:
+				base = 3
+			else:
+				for testbase, nexttestbase in zip(self.bases[:-1], self.bases[1:]):
+					if (tuplet > testbase) and (tuplet < nexttestbase):
+						base = testbase
+						break
+				else:
+					raise AttributeError(f"Unable to find suitable tuplet base < {self.bases[-2]}.")
+		return base
+
+
+	tuplet_base = property(get_tuplet_base, set_tuplet_base)
 
 
 	def __add__(self, other):
