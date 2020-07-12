@@ -696,7 +696,6 @@ class Duration(util.CheckArg):
 		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	'''
 	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False, tuplet=False, tuplet_base=None):
-		# TODO:  Decide how to handle triplets/tuples.
 		# TODO:  Update docstring for tuplets.
 		# TODO:  Pluralize half correctly for counts > 1 (probably not worth it).
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
@@ -789,7 +788,6 @@ class Duration(util.CheckArg):
 
 
 	def set_length(self, length, base=None, count=None, dot=None, tuplet=None):
-		# TODO:  Allow setting Duration length with tuplets.
 		finished = False
 		dotval = {False: 1.0, True: 1.5}
 		if count == 1:
@@ -877,8 +875,20 @@ class Duration(util.CheckArg):
 				base_first_pass = False
 			else:
 				dot = False
-				count = round(count)
-				print(f"Warning:  Rounding Duration to nearest {bases[-1]}th note.")
+				for base in bases:
+					for tuplet_guess in range(2,len(self.tuplet_names)+3):
+						count = length * base * tuplet_guess / self.get_tuplet_base(tuplet_guess)
+						if isclose(count % 1, 0):
+							count = round(count)
+							tuplet = tuplet_guess
+							finished = True
+							break
+					if finished:
+						break
+				if not finished:
+					count = length * base
+					count = round(count)
+					print(f"Warning:  Rounding Duration to nearest {bases[-1]}th note.")
 			if try_dot and (dot != dots[0]):
 				print(f"Warning:  Unable to set duration length {length} with dot {dot}.")
 
@@ -991,8 +1001,9 @@ class Duration(util.CheckArg):
 		return
 
 
-	def get_tuplet_base(self):
-		tuplet = self.tuplet
+	def get_tuplet_base(self, tuplet=None):
+		if tuplet == None:
+			tuplet = self.tuplet
 		base = self._tuplet_base
 		if base is None:
 			if tuplet % 2 == 0:
