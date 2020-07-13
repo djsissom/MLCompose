@@ -819,22 +819,23 @@ class Duration(util.CheckArg):
 
 		try_dot = False
 		dots = [False, True]
+		if (dot is None) and (self.dot):
+			dot = self.dot
 		if dot is not None:
 			try_dot = True
 			if dot:
 				dots = dots[::-1]
 
 		try_tuplet = False
+		tuplets_to_try = list(range(1, len(self.tuplet_names)+2))
 		if tuplet is None:
 			tuplet = self.tuplet
 		if tuplet:
 			try_tuplet = True
+			tuplets_to_try = [tuplet] + tuplets_to_try
 
 		if not finished and try_count and not try_base:
 			for dot in dots:
-				tuplets_to_try = list(range(1, len(self.tuplet_names)+2))
-				if try_tuplet:
-					tuplets_to_try = [tuplet] + tuplets_to_try
 				for tuplet_attempt in tuplets_to_try:
 					base = dotval[dot] * self.get_tuplet_base(tuplet_attempt) / (length * tuplet_attempt)
 					if isclose(base % 1, 0):
@@ -851,27 +852,27 @@ class Duration(util.CheckArg):
 				print(f"Warning:  Unable to set duration length {length} with count {count}.")
 
 		if not finished and try_dot and not try_base:
-			# TODO:  Handle dots and tuplets at the same time.
-			# TODO:  Don't try unwanted dot value.
-			dot_first_pass = True
-			for dot in dots:
+			dot = dots[0]
+			for tuplet_guess in tuplets_to_try:
 				for base in bases:
-					count = length * base / dotval[dot]
+					count = length * base * tuplet_guess / self.get_tuplet_base(tuplet_guess)
+					#count = length * base * tuplet_guess / (dotval[dot] * self.get_tuplet_base(tuplet_guess))
 					if isclose(count % 1, 0):
 						count = round(count)
+						tuplet = tuplet_guess
 						finished = True
 						break
 				if finished:
 					break
-				elif dot_first_pass:
-					print(f"Warning:  Unable to set duration length {length} with dot {dot}.")
-				dot_first_pass = False
+			else:
+				print(f"Warning:  Unable to set duration length {length} with dot {dot}.")
 
 		if not finished:
 			base_first_pass = True
 			for base in bases:
 				for dot in dots:
-					count = length * base / dotval[dot]
+					count = length * base
+					#count = length * base / dotval[dot]
 					if try_tuplet:
 						count = count * tuplet / self.tuplet_base
 					if isclose(count % 1, 0):
