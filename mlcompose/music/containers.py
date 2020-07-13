@@ -851,6 +851,8 @@ class Duration(util.CheckArg):
 				print(f"Warning:  Unable to set duration length {length} with count {count}.")
 
 		if not finished and try_dot and not try_base:
+			# TODO:  Handle dots and tuplets at the same time.
+			# TODO:  Don't try unwanted dot value.
 			dot_first_pass = True
 			for dot in dots:
 				for base in bases:
