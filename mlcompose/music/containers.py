@@ -705,6 +705,7 @@ class Duration(util.CheckArg):
 		self.count = None
 		self.dot = None
 		self.tuplet = None
+		self.max_tuplet_guess = 12
 		self.tuplet_names = ['duplet', 'triplet', 'quadruplet', 'quintuplet', 'sextuplet', 'septuplet', 'octuplet']
 		if (duration is not None) or (name is not None) or (length is not None) or (base is not None):
 			self.set(duration, name, length, count, base, mode, dot, tuplet, tuplet_base)
@@ -829,7 +830,7 @@ class Duration(util.CheckArg):
 
 		try_tuplet = False
 		# TODO:  Make max attempt-able tuplet a settable property.
-		tuplets_to_try = list(range(1, len(self.tuplet_names)+2))
+		tuplets_to_try = list(range(1, self.max_tuplet_guess+1))
 		if tuplet is None:
 			tuplet = self.tuplet
 		if tuplet:
@@ -839,13 +840,13 @@ class Duration(util.CheckArg):
 
 		if not finished and try_count and not try_base:
 			for dot in dots:
-				for tuplet_attempt in tuplets_to_try:
-					base = count * dotval[dot] * self.get_tuplet_base(tuplet_attempt) / (length * tuplet_attempt)
+				for tuplet_guess in tuplets_to_try:
+					base = count * dotval[dot] * self.get_tuplet_base(tuplet_guess) / (length * tuplet_guess)
 					if isclose(base % 1, 0):
 						base = round(base)
 						if base in self.bases:
 							finished = True
-							tuplet = tuplet_attempt
+							tuplet = tuplet_guess
 							if try_dot and (dot != dots[0]):
 								print(f"Warning:  Unable to set duration length {length} with dot {dot}.")
 							break
