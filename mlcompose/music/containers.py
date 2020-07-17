@@ -697,6 +697,7 @@ class Duration(util.CheckArg):
 	'''
 	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False, tuplet=False, tuplet_base=None):
 		# TODO:  Update docstring for tuplets.
+		# TODO:  Swap effect of secondary parameters when setting length directly.
 		# TODO:  Pluralize half correctly for counts > 1 (probably not worth it).
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
