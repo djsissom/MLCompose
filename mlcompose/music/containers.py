@@ -828,17 +828,19 @@ class Duration(util.CheckArg):
 				dots = dots[::-1]
 
 		try_tuplet = False
+		# TODO:  Make max attempt-able tuplet a settable property.
 		tuplets_to_try = list(range(1, len(self.tuplet_names)+2))
 		if tuplet is None:
 			tuplet = self.tuplet
 		if tuplet:
 			try_tuplet = True
 			tuplets_to_try = [tuplet] + tuplets_to_try
+			# TODO:  Add warning prints if tuplet can't be satisfied.
 
 		if not finished and try_count and not try_base:
 			for dot in dots:
 				for tuplet_attempt in tuplets_to_try:
-					base = dotval[dot] * self.get_tuplet_base(tuplet_attempt) / (length * tuplet_attempt)
+					base = count * dotval[dot] * self.get_tuplet_base(tuplet_attempt) / (length * tuplet_attempt)
 					if isclose(base % 1, 0):
 						base = round(base)
 						if base in self.bases:
@@ -856,8 +858,7 @@ class Duration(util.CheckArg):
 			dot = dots[0]
 			for tuplet_guess in tuplets_to_try:
 				for base in bases:
-					count = length * base * tuplet_guess / self.get_tuplet_base(tuplet_guess)
-					#count = length * base * tuplet_guess / (dotval[dot] * self.get_tuplet_base(tuplet_guess))
+					count = length * base * tuplet_guess / (dotval[dot] * self.get_tuplet_base(tuplet_guess))
 					if isclose(count % 1, 0):
 						count = round(count)
 						tuplet = tuplet_guess
@@ -872,8 +873,7 @@ class Duration(util.CheckArg):
 			base_first_pass = True
 			for base in bases:
 				for dot in dots:
-					count = length * base
-					#count = length * base / dotval[dot]
+					count = length * base / dotval[dot]
 					if try_tuplet:
 						count = count * tuplet / self.tuplet_base
 					if isclose(count % 1, 0):
@@ -889,7 +889,7 @@ class Duration(util.CheckArg):
 				dot = False
 				for base in bases:
 					for tuplet_guess in range(2,len(self.tuplet_names)+3):
-						count = length * base * tuplet_guess / self.get_tuplet_base(tuplet_guess)
+						count = length * base * tuplet_guess / (dotval[dot] * self.get_tuplet_base(tuplet_guess))
 						if isclose(count % 1, 0):
 							count = round(count)
 							tuplet = tuplet_guess
@@ -902,7 +902,7 @@ class Duration(util.CheckArg):
 					count = round(count)
 					print(f"Warning:  Rounding Duration to nearest {bases[-1]}th note.")
 			if try_dot and (dot != dots[0]):
-				print(f"Warning:  Unable to set duration length {length} with dot {dot}.")
+				print(f"Warning:  Unable to set duration length {length} with dot {dots[0]}.")
 
 		self.base = base
 		self.count = count

@@ -370,6 +370,7 @@ class TestDurationTuplets(unittest.TestCase):
 
 	#-------------------------------------------------------
 
+	# TODO:  Some of these tests don't make sense anymore with set_length change.
 	def test_duplet_setting_by_length_with_dot(self):
 		d = mus.Duration('eighth', tuplet=2)
 		testlength = d.length
