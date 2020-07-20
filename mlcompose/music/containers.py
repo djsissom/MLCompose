@@ -889,7 +889,7 @@ class Duration(util.CheckArg):
 			else:
 				dot = False
 				for base in bases:
-					for tuplet_guess in range(2,len(self.tuplet_names)+3):
+					for tuplet_guess in range(2, self.max_tuplet_guess):
 						count = length * base * tuplet_guess / (dotval[dot] * self.get_tuplet_base(tuplet_guess))
 						if isclose(count % 1, 0):
 							count = round(count)
