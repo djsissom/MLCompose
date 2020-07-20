@@ -296,7 +296,7 @@ class TestDurationTuplets(unittest.TestCase):
 		d = mus.Duration('eighth', tuplet=2)
 		testlength = d.length
 		d = mus.Duration(length=testlength, count=2)
-		self.assertAlmostEqual(d.length, testlength*2)
+		self.assertAlmostEqual(d.length, testlength)
 		self.assertEqual(d.count, 2)
 		return
 
@@ -305,7 +305,7 @@ class TestDurationTuplets(unittest.TestCase):
 		d = mus.Duration('eighth', tuplet=3)
 		testlength = d.length
 		d = mus.Duration(length=testlength, count=2)
-		self.assertAlmostEqual(d.length, testlength*2)
+		self.assertAlmostEqual(d.length, testlength)
 		self.assertEqual(d.count, 2)
 		return
 
@@ -314,7 +314,7 @@ class TestDurationTuplets(unittest.TestCase):
 		d = mus.Duration('eighth', tuplet=4)
 		testlength = d.length
 		d = mus.Duration(length=testlength, count=2)
-		self.assertAlmostEqual(d.length, testlength*2)
+		self.assertAlmostEqual(d.length, testlength)
 		self.assertEqual(d.count, 2)
 		return
 
@@ -323,7 +323,7 @@ class TestDurationTuplets(unittest.TestCase):
 		d = mus.Duration('eighth', tuplet=5)
 		testlength = d.length
 		d = mus.Duration(length=testlength, count=2)
-		self.assertAlmostEqual(d.length, testlength*2)
+		self.assertAlmostEqual(d.length, testlength)
 		self.assertEqual(d.count, 2)
 		return
 
@@ -333,7 +333,7 @@ class TestDurationTuplets(unittest.TestCase):
 		d = mus.Duration('eighth', tuplet=2)
 		testlength = d.length
 		d = mus.Duration(length=testlength, count=2, tuplet=2)
-		self.assertAlmostEqual(d.length, testlength*2)
+		self.assertAlmostEqual(d.length, testlength)
 		self.assertEqual(d.count, 2)
 		self.assertEqual(d.tuplet, 2)
 		return
@@ -343,7 +343,7 @@ class TestDurationTuplets(unittest.TestCase):
 		d = mus.Duration('eighth', tuplet=3)
 		testlength = d.length
 		d = mus.Duration(length=testlength, count=2, tuplet=3)
-		self.assertAlmostEqual(d.length, testlength*2)
+		self.assertAlmostEqual(d.length, testlength)
 		self.assertEqual(d.count, 2)
 		self.assertEqual(d.tuplet, 3)
 		return
@@ -353,7 +353,7 @@ class TestDurationTuplets(unittest.TestCase):
 		d = mus.Duration('eighth', tuplet=4)
 		testlength = d.length
 		d = mus.Duration(length=testlength, count=2, tuplet=4)
-		self.assertAlmostEqual(d.length, testlength*2)
+		self.assertAlmostEqual(d.length, testlength)
 		self.assertEqual(d.count, 2)
 		self.assertEqual(d.tuplet, 4)
 		return
@@ -363,7 +363,7 @@ class TestDurationTuplets(unittest.TestCase):
 		d = mus.Duration('eighth', tuplet=5)
 		testlength = d.length
 		d = mus.Duration(length=testlength, count=2, tuplet=5)
-		self.assertAlmostEqual(d.length, testlength*2)
+		self.assertAlmostEqual(d.length, testlength)
 		self.assertEqual(d.count, 2)
 		self.assertEqual(d.tuplet, 5)
 		return
@@ -374,7 +374,7 @@ class TestDurationTuplets(unittest.TestCase):
 		d = mus.Duration('eighth', tuplet=2)
 		testlength = d.length
 		d = mus.Duration(length=testlength, dot=True)
-		self.assertAlmostEqual(d.length, testlength*1.5)
+		self.assertAlmostEqual(d.length, testlength)
 		self.assertEqual(d.dot, True)
 		return
 
@@ -383,7 +383,7 @@ class TestDurationTuplets(unittest.TestCase):
 		d = mus.Duration('eighth', tuplet=3)
 		testlength = d.length
 		d = mus.Duration(length=testlength, dot=True)
-		self.assertAlmostEqual(d.length, testlength*1.5)
+		self.assertAlmostEqual(d.length, testlength)
 		self.assertEqual(d.dot, True)
 		return
 
@@ -392,58 +392,18 @@ class TestDurationTuplets(unittest.TestCase):
 		d = mus.Duration('eighth', tuplet=4)
 		testlength = d.length
 		d = mus.Duration(length=testlength, dot=True)
-		self.assertAlmostEqual(d.length, testlength*1.5)
+		self.assertAlmostEqual(d.length, testlength)
 		self.assertEqual(d.dot, True)
 		return
 
 
-	def test_quintuplet_setting_by_length_with_dot(self):
-		d = mus.Duration('eighth', tuplet=5)
+	def test_septuplet_setting_by_length_with_dot(self):
+		# can't pick a valid dotted length for quintuplets
+		d = mus.Duration('eighth', tuplet=6)
 		testlength = d.length
 		d = mus.Duration(length=testlength, dot=True)
-		self.assertAlmostEqual(d.length, testlength*1.5)
+		self.assertAlmostEqual(d.length, testlength)
 		self.assertEqual(d.dot, True)
-		return
-
-	#-------------------------------------------------------
-
-	def test_duplet_setting_by_length_with_dot_retain_tuplet(self):
-		d = mus.Duration('eighth', tuplet=2)
-		testlength = d.length
-		d = mus.Duration(length=testlength, dot=True, tuplet=2)
-		self.assertAlmostEqual(d.length, testlength*1.5)
-		self.assertEqual(d.dot, True)
-		self.assertEqual(d.tuplet, 2)
-		return
-
-
-	def test_triplet_setting_by_length_with_dot_retain_tuplet(self):
-		d = mus.Duration('eighth', tuplet=3)
-		testlength = d.length
-		d = mus.Duration(length=testlength, dot=True, tuplet=3)
-		self.assertAlmostEqual(d.length, testlength*1.5)
-		self.assertEqual(d.dot, True)
-		self.assertEqual(d.tuplet, 3)
-		return
-
-
-	def test_quadruplet_setting_by_length_with_dot_retain_tuplet(self):
-		d = mus.Duration('eighth', tuplet=4)
-		testlength = d.length
-		d = mus.Duration(length=testlength, dot=True, tuplet=4)
-		self.assertAlmostEqual(d.length, testlength*1.5)
-		self.assertEqual(d.dot, True)
-		self.assertEqual(d.tuplet, 4)
-		return
-
-
-	def test_quintuplet_setting_by_length_with_dot_retain_tuplet(self):
-		d = mus.Duration('eighth', tuplet=5)
-		testlength = d.length
-		d = mus.Duration(length=testlength, dot=True, tuplet=5)
-		self.assertAlmostEqual(d.length, testlength*1.5)
-		self.assertEqual(d.dot, True)
-		self.assertEqual(d.tuplet, 5)
 		return
 
 

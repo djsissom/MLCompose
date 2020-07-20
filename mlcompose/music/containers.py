@@ -697,6 +697,7 @@ class Duration(util.CheckArg):
 	'''
 	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False, tuplet=False, tuplet_base=None):
 		# TODO:  Update docstring for tuplets.
+		# TODO:  Swap effect of secondary parameters when setting length directly.
 		# TODO:  Pluralize half correctly for counts > 1 (probably not worth it).
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
@@ -704,6 +705,7 @@ class Duration(util.CheckArg):
 		self.count = None
 		self.dot = None
 		self.tuplet = None
+		self.max_tuplet_guess = 12
 		self.tuplet_names = ['duplet', 'triplet', 'quadruplet', 'quintuplet', 'sextuplet', 'septuplet', 'octuplet']
 		if (duration is not None) or (name is not None) or (length is not None) or (base is not None):
 			self.set(duration, name, length, count, base, mode, dot, tuplet, tuplet_base)
@@ -827,22 +829,24 @@ class Duration(util.CheckArg):
 				dots = dots[::-1]
 
 		try_tuplet = False
-		tuplets_to_try = list(range(1, len(self.tuplet_names)+2))
+		# TODO:  Make max attempt-able tuplet a settable property.
+		tuplets_to_try = list(range(1, self.max_tuplet_guess+1))
 		if tuplet is None:
 			tuplet = self.tuplet
 		if tuplet:
 			try_tuplet = True
 			tuplets_to_try = [tuplet] + tuplets_to_try
+			# TODO:  Add warning prints if tuplet can't be satisfied.
 
 		if not finished and try_count and not try_base:
 			for dot in dots:
-				for tuplet_attempt in tuplets_to_try:
-					base = dotval[dot] * self.get_tuplet_base(tuplet_attempt) / (length * tuplet_attempt)
+				for tuplet_guess in tuplets_to_try:
+					base = count * dotval[dot] * self.get_tuplet_base(tuplet_guess) / (length * tuplet_guess)
 					if isclose(base % 1, 0):
 						base = round(base)
 						if base in self.bases:
 							finished = True
-							tuplet = tuplet_attempt
+							tuplet = tuplet_guess
 							if try_dot and (dot != dots[0]):
 								print(f"Warning:  Unable to set duration length {length} with dot {dot}.")
 							break
@@ -855,8 +859,7 @@ class Duration(util.CheckArg):
 			dot = dots[0]
 			for tuplet_guess in tuplets_to_try:
 				for base in bases:
-					count = length * base * tuplet_guess / self.get_tuplet_base(tuplet_guess)
-					#count = length * base * tuplet_guess / (dotval[dot] * self.get_tuplet_base(tuplet_guess))
+					count = length * base * tuplet_guess / (dotval[dot] * self.get_tuplet_base(tuplet_guess))
 					if isclose(count % 1, 0):
 						count = round(count)
 						tuplet = tuplet_guess
@@ -871,8 +874,7 @@ class Duration(util.CheckArg):
 			base_first_pass = True
 			for base in bases:
 				for dot in dots:
-					count = length * base
-					#count = length * base / dotval[dot]
+					count = length * base / dotval[dot]
 					if try_tuplet:
 						count = count * tuplet / self.tuplet_base
 					if isclose(count % 1, 0):
@@ -887,8 +889,8 @@ class Duration(util.CheckArg):
 			else:
 				dot = False
 				for base in bases:
-					for tuplet_guess in range(2,len(self.tuplet_names)+3):
-						count = length * base * tuplet_guess / self.get_tuplet_base(tuplet_guess)
+					for tuplet_guess in range(2, self.max_tuplet_guess):
+						count = length * base * tuplet_guess / (dotval[dot] * self.get_tuplet_base(tuplet_guess))
 						if isclose(count % 1, 0):
 							count = round(count)
 							tuplet = tuplet_guess
@@ -900,8 +902,6 @@ class Duration(util.CheckArg):
 					count = length * base
 					count = round(count)
 					print(f"Warning:  Rounding Duration to nearest {bases[-1]}th note.")
-			if try_dot and (dot != dots[0]):
-				print(f"Warning:  Unable to set duration length {length} with dot {dot}.")
 
 		self.base = base
 		self.count = count
