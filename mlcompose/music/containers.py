@@ -902,8 +902,6 @@ class Duration(util.CheckArg):
 					count = length * base
 					count = round(count)
 					print(f"Warning:  Rounding Duration to nearest {bases[-1]}th note.")
-			if try_dot and (dot != dots[0]):
-				print(f"Warning:  Unable to set duration length {length} with dot {dots[0]}.")
 
 		self.base = base
 		self.count = count
