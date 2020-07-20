@@ -370,7 +370,6 @@ class TestDurationTuplets(unittest.TestCase):
 
 	#-------------------------------------------------------
 
-	# TODO:  Some of these tests don't make sense anymore with set_length change.
 	def test_duplet_setting_by_length_with_dot(self):
 		d = mus.Duration('eighth', tuplet=2)
 		testlength = d.length
@@ -398,53 +397,13 @@ class TestDurationTuplets(unittest.TestCase):
 		return
 
 
-	def test_quintuplet_setting_by_length_with_dot(self):
-		d = mus.Duration('eighth', tuplet=5)
+	def test_septuplet_setting_by_length_with_dot(self):
+		# can't pick a valid dotted length for quintuplets
+		d = mus.Duration('eighth', tuplet=6)
 		testlength = d.length
 		d = mus.Duration(length=testlength, dot=True)
 		self.assertAlmostEqual(d.length, testlength)
 		self.assertEqual(d.dot, True)
-		return
-
-	#-------------------------------------------------------
-
-	def test_duplet_setting_by_length_with_dot_retain_tuplet(self):
-		d = mus.Duration('eighth', tuplet=2)
-		testlength = d.length
-		d = mus.Duration(length=testlength, dot=True, tuplet=2)
-		self.assertAlmostEqual(d.length, testlength)
-		self.assertEqual(d.dot, True)
-		self.assertEqual(d.tuplet, 2)
-		return
-
-
-	def test_triplet_setting_by_length_with_dot_retain_tuplet(self):
-		d = mus.Duration('eighth', tuplet=3)
-		testlength = d.length
-		d = mus.Duration(length=testlength, dot=True, tuplet=3)
-		self.assertAlmostEqual(d.length, testlength)
-		self.assertEqual(d.dot, True)
-		self.assertEqual(d.tuplet, 3)
-		return
-
-
-	def test_quadruplet_setting_by_length_with_dot_retain_tuplet(self):
-		d = mus.Duration('eighth', tuplet=4)
-		testlength = d.length
-		d = mus.Duration(length=testlength, dot=True, tuplet=4)
-		self.assertAlmostEqual(d.length, testlength)
-		self.assertEqual(d.dot, True)
-		self.assertEqual(d.tuplet, 4)
-		return
-
-
-	def test_quintuplet_setting_by_length_with_dot_retain_tuplet(self):
-		d = mus.Duration('eighth', tuplet=5)
-		testlength = d.length
-		d = mus.Duration(length=testlength, dot=True, tuplet=5)
-		self.assertAlmostEqual(d.length, testlength)
-		self.assertEqual(d.dot, True)
-		self.assertEqual(d.tuplet, 5)
 		return
 
 
