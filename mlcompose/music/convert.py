@@ -21,10 +21,10 @@ def main():
 
 # TODO:  song_to_midi_file function
 
-def song_to_midi(song, midi_file='song.mid'):
-	pattern = midi.Pattern(resolution=32)
+def song_to_midi(song, midi_file='song.mid', resolution=120):
+	pattern = midi.Pattern(resolution=resolution)
 	for track in song.tracks:
-		midi_track = track_to_midi(track)
+		midi_track = track_to_midi(track, resolution=resolution)
 		pattern.append(midi_track)
 
 	# Save the pattern to disk
@@ -33,7 +33,7 @@ def song_to_midi(song, midi_file='song.mid'):
 
 
 
-def track_to_midi(track):
+def track_to_midi(track, resolution=120):
 	midi_track = midi.Track()
 
 	# deactivation_queue is an array with a value for each midi note pitch
@@ -44,7 +44,7 @@ def track_to_midi(track):
 	for measure in track.measures:
 		# TODO:  Handle key and time signature to create midi events
 		for beat in measure.beats:
-			ticks_to_beat = midi_length(beat.offset)
+			ticks_to_beat = midi_length(beat.offset, resolution=resolution)
 
 			mask = (deactivation_queue >= 0)
 			if mask.any():
@@ -73,7 +73,7 @@ def track_to_midi(track):
 				midi_pitch = note.value
 				note_on_event = midi.NoteOnEvent(tick=int(ticks_to_beat), velocity=midi_velocity, pitch=midi_pitch)
 				midi_track.append(note_on_event)
-				deactivation_queue[midi_pitch] = midi_length(note.duration) # note: doesn't handle ties yet
+				deactivation_queue[midi_pitch] = midi_length(note.duration, resolution=resolution) # note: doesn't handle ties yet
 				ticks_to_beat = 0
 
 			for event in beat.events:
@@ -93,10 +93,10 @@ def track_to_midi(track):
 
 
 
-def midi_length(duration, tpq=32):
+def midi_length(duration, resolution=120):
 	if isinstance(duration, music.Duration):
 		duration = duration.length
-	length = int(tpq * 4 * duration)
+	length = int(resolution * 4 * duration)
 	return length
 
 
