@@ -13,7 +13,15 @@ class TestMidi(unittest.TestCase):
 		beat = measure.beats[0]
 		note = beat.add_note(mus.Note('C_6', duration='quarter'))
 		beat = measure.append_beat()
+		rest = beat.add_note(mus.Rest(duration='dotted quarter'))
+		beat = measure.append_beat()
 		note = beat.add_note(mus.Note('C_7', duration='eighth'))
+		measure.pad_rests()
+
+		measure = track.append_measure()
+		beat = measure.beats[0]
+		note = beat.add_note(mus.Note('C_6', duration='quarter'))
+		measure.pad_rests()
 		song.end_song()
 
 		song.to_midi('midiout_test.mid')

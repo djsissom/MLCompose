@@ -69,6 +69,9 @@ def track_to_midi(track, resolution=120):
 					ticks_to_off_event = 999999999
 
 			for note in beat.notes:
+				if isinstance(note, music.Rest):
+					# TODO:  Handle ending rests that are getting skipped.
+					continue
 				midi_velocity = int(note.intensity * 127)
 				midi_pitch = note.value
 				note_on_event = midi.NoteOnEvent(tick=int(ticks_to_beat), velocity=midi_velocity, pitch=midi_pitch)
