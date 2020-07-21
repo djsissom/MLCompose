@@ -72,7 +72,7 @@ def track_to_midi(track, resolution=120):
 				if isinstance(note, music.Rest):
 					# TODO:  Handle ending rests that are getting skipped.
 					continue
-				midi_velocity = int(note.intensity * 127)
+				midi_velocity = round(note.intensity * 127)
 				midi_pitch = note.value
 				note_on_event = midi.NoteOnEvent(tick=int(ticks_to_beat), velocity=midi_velocity, pitch=midi_pitch)
 				midi_track.append(note_on_event)
@@ -99,7 +99,7 @@ def track_to_midi(track, resolution=120):
 def midi_length(duration, resolution=120):
 	if isinstance(duration, music.Duration):
 		duration = duration.length
-	length = int(resolution * 4 * duration)
+	length = round(resolution * 4 * duration)
 	return length
 
 
