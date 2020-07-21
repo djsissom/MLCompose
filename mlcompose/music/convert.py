@@ -22,7 +22,7 @@ def main():
 # TODO:  song_to_midi_file function
 
 def song_to_midi(song, midi_file='song.mid'):
-	pattern = midi.Pattern()
+	pattern = midi.Pattern(resolution=32)
 	for track in song.tracks:
 		midi_track = track_to_midi(track)
 		pattern.append(midi_track)
@@ -54,12 +54,12 @@ def track_to_midi(track):
 
 			# add note off events until time for the next beat
 			while ticks_to_off_event <= ticks_to_beat:
-				pitches_to_deactivate = np.where(deactivation_queue == ticks_to_off_event)
+				pitches_to_deactivate = np.where(deactivation_queue == ticks_to_off_event)[0]
 				deactivation_queue[mask] -= ticks_to_off_event
 				deactivation_queue[pitches_to_deactivate] -= 1
 				ticks_to_beat -= ticks_to_off_event
 				for pitch in pitches_to_deactivate:
-					off_event = midi.NoteOffEvent(tick=ticks_to_off_event, pitch=pitch)
+					off_event = midi.NoteOffEvent(tick=int(ticks_to_off_event), pitch=int(pitch))
 					midi_track.append(off_event)
 					ticks_to_off_event = 0
 				mask = (deactivation_queue >= 0)
@@ -71,7 +71,7 @@ def track_to_midi(track):
 			for note in beat.notes:
 				midi_velocity = int(note.intensity * 127)
 				midi_pitch = note.value
-				note_on_event = midi.NoteOnEvent(tick=ticks_to_beat, velocity=midi_velocity, pitch=midi_pitch)
+				note_on_event = midi.NoteOnEvent(tick=int(ticks_to_beat), velocity=midi_velocity, pitch=midi_pitch)
 				midi_track.append(note_on_event)
 				deactivation_queue[midi_pitch] = midi_length(note.duration) # note: doesn't handle ties yet
 				ticks_to_beat = 0
@@ -94,13 +94,10 @@ def track_to_midi(track):
 
 
 def midi_length(duration, tpq=32):
-	if duration == 0 or duration.base == 0:
-		length = 0
-	else:
-		length = tpq * 4. / duration.base
-		if duration.dot:
-			length = length * 1.5
-	return int(length)
+	if isinstance(duration, music.Duration):
+		duration = duration.length
+	length = int(tpq * 4 * duration)
+	return length
 
 
 
