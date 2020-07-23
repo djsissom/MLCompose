@@ -24,7 +24,7 @@ class TestMidi(unittest.TestCase):
 		measure.pad_rests()
 		song.end_song()
 
-		song.to_midi('midiout_test.mid')
+		song.to_midi('miditest_out.mid')
 		# TODO:  check created file against known good file
 		return
 
