@@ -188,28 +188,35 @@ class Measure():
 	complete = property(get_complete, set_complete)
 
 
+	def get_duration(self):
+		ts = self.time_signature
+		duration = ts.numerator * Duration(ts.denominator)
+		return duration
+
+
+	duration = property(get_duration)
+
+
 	def get_remaining_duration(self, beat=None, note=None, method='min'):
 		if note == None:
 			if beat == None:
 				beat = self.beats[-1]
-			if beat.notes == []:
+			if (beat.notes == []) or (method == 'start') or (method == 'beat'):
 				note = Note('C', duration=0)  # make a dummy note with zero duration for calculations
 			elif method[:3].lower() == 'min' or method[:5].lower() == 'short':
 				note = beat.shortest_note
 			elif method[:3].lower() == 'max' or method[:4].lower() == 'long':
 				note = beat.longest_note
 			else:
-				raise AttributeError("Allowed methods for get_remaining_duration are 'min'/'short' and 'max'/'long'")
+				raise AttributeError("Allowed methods for get_remaining_duration are 'min'/'short', 'max'/'long', or 'start'/'beat'")
 		elif beat == None:
 			for potential_beat in self.beats:
 				if note in potential_beat.notes:
 					beat = potential_beat
 		beat_index = self.beats.index(beat)
-		ts = self.time_signature
-		total_duration = ts.numerator * Duration(ts.denominator)
 		passed_duration = sum([beat.offset for beat in self.beats[:beat_index + 1]])
 		passed_duration = passed_duration + note.duration
-		remaining_duration = total_duration - passed_duration
+		remaining_duration = self.duration - passed_duration
 		return remaining_duration
 
 
