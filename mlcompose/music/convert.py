@@ -40,11 +40,21 @@ def track_to_midi(track, resolution=120):
 	# negative numbers indicate the pitch is not active
 	# positive numbers are the remaining ticks until cutoff
 	deactivation_queue = np.zeros(128, dtype=np.int) - 1
+	ticks_to_measure = 0
 
 	for measure in track.measures:
 		# TODO:  Handle key and time signature to create midi events
+		# TODO:  The pad_rests method probably isn't going to let this handle overlapping beats/rests correctly.
+
+		# Make sure the measure is filled so the next measure starts at the right time.
+		measure.pad_rests()
+		# Add an empty final beat to run the loop one last time to deactivate notes.
+		measure.append_beat()
+
 		for beat in measure.beats:
 			ticks_to_beat = midi_length(beat.offset, resolution=resolution)
+			if beat is measure.beats[0]:
+				ticks_to_beat = ticks_to_beat + ticks_to_measure
 
 			mask = (deactivation_queue >= 0)
 			if mask.any():
@@ -70,7 +80,7 @@ def track_to_midi(track, resolution=120):
 
 			for note in beat.notes:
 				if isinstance(note, music.Rest):
-					# TODO:  Handle ending rests that are getting skipped.
+					ticks_to_measure = ticks_to_measure + midi_length(note.duration, resolution=resolution)
 					continue
 				midi_velocity = round(note.intensity * 127)
 				midi_pitch = note.value
@@ -78,6 +88,7 @@ def track_to_midi(track, resolution=120):
 				midi_track.append(note_on_event)
 				deactivation_queue[midi_pitch] = midi_length(note.duration, resolution=resolution) # note: doesn't handle ties yet
 				ticks_to_beat = 0
+				ticks_to_measure = 0
 
 			for event in beat.events:
 				if event.name == 'end_track':
@@ -87,6 +98,7 @@ def track_to_midi(track, resolution=120):
 				# TODO:  look into event specification
 				midi_track.append(midi_event)
 				ticks_to_beat = 0
+				ticks_to_measure = 0
 
 	# End the track
 	if not isinstance(midi_track[-1], midi.EndOfTrackEvent):
