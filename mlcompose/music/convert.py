@@ -92,7 +92,7 @@ def track_to_midi(track, resolution=120):
 
 			for event in beat.events:
 				if event.name == 'end_track':
-					midi_event = midi.EndOfTrackEvent(tick=1)
+					midi_event = midi.EndOfTrackEvent(tick=ticks_to_beat)
 				else:
 					midi_event = midi.ControlChangeEvent(tick=ticks_to_beat)
 				# TODO:  look into event specification

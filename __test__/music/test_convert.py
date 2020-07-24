@@ -31,7 +31,7 @@ class TestMidi(unittest.TestCase):
 			   midi.NoteOffEvent(tick=120, channel=0, data=[72, 0]),
 			   midi.NoteOnEvent(tick=360, channel=0, data=[72, 127]),
 			   midi.NoteOffEvent(tick=120, channel=0, data=[72, 0]),
-			   midi.EndOfTrackEvent(tick=1, data=[])])])'''
+			   midi.EndOfTrackEvent(tick=360, data=[])])])'''
 		)
 		self.maxDiff = None
 		self.assertMultiLineEqual(repr(pattern), test_string)
@@ -74,7 +74,7 @@ class TestMidi(unittest.TestCase):
 			   midi.NoteOffEvent(tick=60, channel=0, data=[84, 0]),
 			   midi.NoteOnEvent(tick=120, channel=0, data=[72, 127]),
 			   midi.NoteOffEvent(tick=120, channel=0, data=[72, 0]),
-			   midi.EndOfTrackEvent(tick=1, data=[])])])'''
+			   midi.EndOfTrackEvent(tick=360, data=[])])])'''
 			)
 		self.maxDiff = None
 		self.assertMultiLineEqual(repr(pattern), test_string)
