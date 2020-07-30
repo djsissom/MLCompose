@@ -653,10 +653,9 @@ class Duration(util.CheckArg):
 	Duration and number-based objects.  Durations can be added, subtracted,
 	multiplied and divided with other Duration instances and number-based
 	objects, returning either a new Duration instance or float number,
-	depending on what makes sense with the units and allowed duration lengths.
-	It is generally advisable to not set durations longer than a measure and to
-	instead set the tie flag for the note or rest to carry over to another
-	instance in the next measure.
+	depending on what makes sense with the units.  It is generally advisable to
+	not set durations longer than a measure and to instead set the tie flag for
+	the note or rest to carry over to another instance in the next measure.
 
 	Parameters
 	----------
@@ -671,16 +670,25 @@ class Duration(util.CheckArg):
 	name : str (optional)
 		Specify the duration name.  Allowed names are English note names
 		between 'whole' and 'sixty-fourth', optionally prepended with 'dotted '
-		to override and enable the dot option (e.g. 'dotted thirty-second').
-		If both base and name are passed when setting the duration, overrides
-		base.  Respects the dot parameter unless name begins with 'dotted', in
-		which case dot is set to True.
+		to override and enable the dot option (e.g. 'dotted thirty-second')
+		and/or a tuplet name (e.g. 'triplet quarter' or 'quintuplet dotted
+		eighth').  If both base and name are passed when setting the duration,
+		overrides base.  Respects the dot parameter unless name begins with
+		'dotted', in which case dot is set to True.  Respects the tuplet
+		parameter unless name begins with the name of a tuplet, in which case
+		the tuplet parameter is overridden.
 	length : float or int (optional)
-		Specify the duration length.  This is the count divided by the duration
-		base.  Ambiguous lengths set the count and base to the smallest valid
-		values (e.g. length=0.5 sets the duration as one half note instead of
-		two quarter notes) unless the count or base parameters are explicitly
-		specified.
+		Specify the duration length as a fraction of a whole note.  Setting the
+		length directly attempts to heuristically determine the remaining free
+		unspecified parameters to achieve the specified length so that
+
+			length = count * dotval * tuplet_base / (base * tuplet),
+
+		where dotval is either 1.5 or 1.0 for dot values of True or False,
+		respectively.  Ambiguous lengths set the count and base to the smallest
+		valid values (e.g.  length=0.5 sets the duration as one half note
+		instead of two quarter notes) unless the base, count, dot, or tuplet
+		parameters are explicitly specified.
 	base : int power of 2 <= 64 or int <= 6 (optional)
 		Specify the duration base.  Allowed values are powers of 2 between 1
 		and 64 if mode is 'inverse' (where '1' is a whole note and '64' is a
@@ -698,14 +706,19 @@ class Duration(util.CheckArg):
 		Specify whether the duration should be dotted.  If True, the base
 		duration is multiplied by 1.5 (e.g., a dotted quarter is three
 		eighths).
-	tuplet : False or int (optional)
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	tuplet : False, int, or string (optional)
+		Specify the duration tuplet value.  Integer values of 0 or 1 set tuplet
+		to False.  Integer values > 1 set the number of occurrences that fill
+		the value of tuplet_base (e.g. 2 is a duplet, 3 is a triplet, 5 is a
+		quintuplet, etc.).  Strings must be one of the values listed in the
+		tuplet_names property.
 	tuplet_base : None or int (optional)
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		Specify the number of beats over which to split the tuplet.  If None,
+		automatically determined such that tuplet_base is 3 if tuplet is even
+		and tuplet_base is the closest power of 2 smaller than tuplet if tuplet
+		is odd.
 	'''
 	def __init__(self, duration=None, name=None, length=None, base=None, count=1, mode='inverse', dot=False, tuplet=False, tuplet_base=None):
-		# TODO:  Update docstring for tuplets.
-		# TODO:  Swap effect of secondary parameters when setting length directly.
 		# TODO:  Pluralize half correctly for counts > 1 (probably not worth it).
 		self.names = ['whole', 'half', 'quarter', 'eighth', 'sixteenth', 'thirty-second', 'sixty-fourth', 'zero']
 		self.bases = [1, 2, 4, 8, 16, 32, 64, 0]
@@ -761,6 +774,7 @@ class Duration(util.CheckArg):
 				name = name[:-1]
 		except ValueError:
 			pass
+		# TODO:  Swap parsing order for dotted tuplets.
 		if name[:6].lower() == 'dotted':
 			self.dot = True
 			name = name[7:]
@@ -837,7 +851,6 @@ class Duration(util.CheckArg):
 				dots = dots[::-1]
 
 		try_tuplet = False
-		# TODO:  Make max attempt-able tuplet a settable property.
 		tuplets_to_try = list(range(1, self.max_tuplet_guess+1))
 		if tuplet is None:
 			tuplet = self.tuplet
