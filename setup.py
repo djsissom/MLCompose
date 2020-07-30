@@ -4,7 +4,7 @@ import setuptools
 
 setuptools.setup(
 	name='mlcompose',
-	version='0.0.0',
+	version='0.1.0',
 	author='Daniel Sissom',
 	author_email='daniel@arclet.org',
 	description='Compose music with machine learning.',

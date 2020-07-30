@@ -13,7 +13,8 @@ class InheritanceTestClass1(containers.CheckArg):
 
 class InheritanceTestClass2(containers.CheckArg):
 	def __init__(self, arg):
-		print(arg)
+		#print(arg)
+		pass
 
 
 
