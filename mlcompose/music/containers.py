@@ -774,10 +774,6 @@ class Duration(util.CheckArg):
 				name = name[:-1]
 		except ValueError:
 			pass
-		# TODO:  Swap parsing order for dotted tuplets.
-		if name[:6].lower() == 'dotted':
-			self.dot = True
-			name = name[7:]
 		for testlength in range(len(min(self.tuplet_names, key=len)), len(max(self.tuplet_names, key=len))+1):
 			try:
 				self.tuplet = name[:testlength]
@@ -785,6 +781,9 @@ class Duration(util.CheckArg):
 				break
 			except AttributeError:
 				pass
+		if name[:6].lower() == 'dotted':
+			self.dot = True
+			name = name[7:]
 		if name.lower() in self.names:
 			list_index = self.names.index(name.lower())
 			self.base = self.bases[list_index]
